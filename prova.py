@@ -1,1 +1,0 @@
-""" ellissometro file di prova """
