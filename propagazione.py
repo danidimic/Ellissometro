@@ -24,10 +24,10 @@ def propagazione(ii, jj, x_pi, x_sigma, strati, wsuc, theta, nc, spessori, tau_s
             "interfaccia".
     nc : indice di rifrazione (complesso (?)) *c (il substrato ne ha uno non nullo (?)).
     spessori : array con gli spessori dei vari strati.
-    tau_sigma : coefficienti di trasmissione dei raggi plarizzati s.
-    rho_sigma : coefficienti di riflessione dei raggi plarizzati s.
-    tau_pi : coefficienti di trasmissione dei raggi plarizzati p.
-    rho_pi : coefficienti di riflessione dei raggi plarizzati p.
+    tau_sigma : coefficienti di trasmissione dei raggi polarizzati s.
+    rho_sigma : coefficienti di riflessione dei raggi polarizzati s.
+    tau_pi : coefficienti di trasmissione dei raggi polarizzati p.
+    rho_pi : coefficienti di riflessione dei raggi polarizzati p.
     somma_pi : contributo parziale, propveniente dalle chiamate precedenti 
                all'ampiezza p in uscita.
     somma_sigma : contributo parziale, propveniente dalle chiamate precedenti 
