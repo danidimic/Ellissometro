@@ -47,8 +47,8 @@ def propagazione(ii, jj, x_pi, x_sigma, strati, wsuc, theta, nc, spessori, tau_s
     
     nraggi = len(ii) #numero di raggi
     
-    #INIZIALIZZO a 0 itau_pi ecc... nota che considero il mezzo in cui sto come strato 1
-    irho_pi = [0 for x in range(nraggi)] #SARà GIUSTA LA DIMENSIONE????
+    #INIZIALIZZO a 0 itau_pi ecc...
+    irho_pi = [0 for x in range(nraggi)]
     irho_sigma = [0 for x in range(nraggi)]
     itau_pi = [0 for x in range(nraggi)]
     itau_sigma = [0 for x in range(nraggi)]
@@ -97,8 +97,6 @@ def propagazione(ii, jj, x_pi, x_sigma, strati, wsuc, theta, nc, spessori, tau_s
                 ii_superficial_ur.append(1)
                 jj_superficial_ur.append(2)
                 
-                print(jj_superficial_ur)
-                
                 phase = (-wsuc*(spessori[1])/np.cos(theta[ii[1]]))*nc[1] #CONTROLLA COME INDICIZZI GLI STRATI!!!!!!!!
                 
                 # -polarizzati p
@@ -114,7 +112,7 @@ def propagazione(ii, jj, x_pi, x_sigma, strati, wsuc, theta, nc, spessori, tau_s
                     irho_sigma[x] = -rho_sigma[jj[x]] #...in direzione "opposta", quindi... (vedi formule coefficienti di Fresnel)
                     itau_pi[x] = tau_pi[jj[x]] #anche qui: vedi formule e te ne convinci!
                     itau_sigma[x] = tau_sigma[jj[x]]
-                elif ii[x] < jj[x] and ii[x] < strati + 1: #non analizzo più i raggi che vanno nel substrato
+                elif ii[x] < jj[x] and ii[x] < strati+1: #non analizzo più i raggi che vanno nel substrato
                     indici_raggi_giù.append(x)
                     irho_pi[x] = rho_pi[ii[x]]
                     irho_sigma[x] = rho_sigma[ii[x]]
@@ -144,8 +142,8 @@ def propagazione(ii, jj, x_pi, x_sigma, strati, wsuc, theta, nc, spessori, tau_s
     ii_dt = [0 for x in range(nraggi_down)]
     jj_dt = [0 for x in range(nraggi_down)]
         
-    print(indici_raggi_su)
-    print(indici_raggi_giù)
+    #print(indici_raggi_su)
+    #print(indici_raggi_giù)
     
     #aggiorno ampiezze dopo la propagazione
     #raggi che salgono
