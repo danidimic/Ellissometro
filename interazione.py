@@ -66,7 +66,7 @@ class interazione:
 		le riflessvità e trsmissività rho_X e tau_x necessari 
 		per la funzione propagazione
 		"""
-
+		Theta.append(theta0)
 		for i in range(strati-1):
 			res = self.interfaccia(theta0, nc[i], nc[i+1])
 			self.Theta.append(res[0])	#angolo di rifrazione
