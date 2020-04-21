@@ -5,17 +5,29 @@ import numpy as np
 from campione import campione 
 import sorgente
 
+c=299792458; #(m/s);
+h=4.13566743e-15; #(eV s)
 
 class interazione:
 
-	def __init__(self, precisione):
+	def __init__(self, precisione, campione, sorgente):
 		
 		self.Theta = []		#vettore contenente tutti gli angoli di incidenza
 		self.rho_S = [] 	#vettore contenente tutte le riflessività ortogonali
 		self.rho_P = [] 	#vettore contenente tutte le riflessività parallele
 		self.tau_S = [] 	#vettore contenente tutte le trasmissività ortogonali
 		self.tau_P = [] 	#vettore contenente tutte le trasmissività parallele
-		self.precisione = precisione  #soglia al di sotto della quale non considero più i raggi.
+	
+		self.campione = campione	#campione da analizzare
+		self.sorgente = sorgente	#sorgente di radiazione
+		self.precisione = precisione
+
+		self.somma_pi = 0
+		self.somma_sigma = 0
+		self.ii
+		self.jj
+		self.y_pi
+		self.y_sigma
 
 
 
@@ -60,15 +72,15 @@ class interazione:
 
 
 	#funzione per calcolare tutti i theta, rho, tau necessari per 'propagazione'
-	def inizializza(self, theta0, nc, strati):	#TODO i parametri nc e strati devono essere passati dal campione
+	def inizializza(self, theta0):	#TODO i parametri nc e strati devono essere passati dal campione
 		"""
 		Funzione che determina tutti gli angoli di rifrazione theta, 
 		le riflessvità e trsmissività rho_X e tau_x necessari 
 		per la funzione propagazione
 		"""
 		Theta.append(theta0)
-		for i in range(strati-1):
-			res = self.interfaccia(theta0, nc[i], nc[i+1])
+		for i in range(self.campione.strati-1):
+			res = self.interfaccia(theta0, self.campione.nc[i], self.campione.nc[i+1])
 			self.Theta.append(res[0])	#angolo di rifrazione
 			self.tau_S.append(res[1]) 	#trasmissività ortogonale
 			self.rho_S.append(res[2])	#riflessività ortogonale
@@ -78,7 +90,7 @@ class interazione:
 
 
 	#funzione per propagare i raggi luminosi
-	def propagazione(ii, jj, x_pi, x_sigma, strati, wsuc, nc, spessori, somma_pi, somma_sigma):#TODO parametri devono essere passati da campione o sorgente
+	def propagazione():	#TODO parametri devono essere passati da campione o sorgente
 		"""
 		Parameters (molti saranno nella classe "campione")
 		----------
@@ -105,6 +117,19 @@ class interazione:
 		y_sigma : nuove ampiezze dei raggi s.
 
 		"""
+		nc = self.campione.nc
+		strati = self.campione.strati
+		spessori = self.campione.spessori
+
+		x_pi = self.y_pi
+		x_sigma = self.y_sigma
+		
+		ii = self.ii
+		jj = self.jj
+
+		omega=2*math.pi*sorgente.energia/h;
+		wsuc=omega/c;
+
 		indici_raggi_su = [] #lista degli indici
 		indici_raggi_giù = []
 		
@@ -126,8 +151,8 @@ class interazione:
 		ydt_sup_pi = []
 		ydt_sup_sigma = []
 		
-		somma_pi = 0 #qui metterò le ampiezze del raggio totale uscente
-		somma_sigma = 0
+		#self.somma_pi = 0
+		#self.somma_sigma = 0
 		
 		phase = 0 #solo di supporto per i conti
 		
@@ -139,8 +164,8 @@ class interazione:
 		            
 		        #se i raggi sono nel mezzo, ho un raggio riflesso, che risolvo subito, e uno trasmesso sotto
 		        if ii[x] == 0 and jj[x] == 1:
-		            somma_pi = somma_pi + x_pi[x]*self.rho_P[0]
-		            somma_sigma = somma_sigma + x_sigma[x]*self.rho_S[0]  
+		            self.somma_pi += x_pi[x]*self.rho_P[0]
+		            self.somma_sigma += x_sigma[x]*self.rho_S[0]  
 		            #devo aggiungere il raggio trasmesso che viene prodotto (avrà ii=1, jj=2)
 		            ii_superficial_dt.append(1)
 		            jj_superficial_dt.append(2)
@@ -154,8 +179,8 @@ class interazione:
 		            
 		        #se sono nel primo strato e stanno salendo ho un raggio trasmesso, ...idem
 		        elif ii[x] == 1 and jj[x] == 0:
-		            somma_pi = somma_pi + x_pi[x]*self.tau_P[x]
-		            somma_sigma = somma_sigma + x_sigma[x]*self.tau_S[0] #vedi formule coefficienti di Fresnel!
+		            self.somma_pi += x_pi[x]*self.tau_P[x]
+		            self.somma_sigma += x_sigma[x]*self.tau_S[0] #vedi formule coefficienti di Fresnel!
 		            #devo aggiungere il raggio che manca (come prima)
 		            ii_superficial_ur.append(1)
 		            jj_superficial_ur.append(2)
@@ -266,19 +291,16 @@ class interazione:
 		    jj_dt[x] = ii[indici_raggi_giù[x]]+2
 		    
 		#nuovi array (liste) con le direzioni dei nuovi raggi prodotti    
-		ii_new = ii_ur + ii_ut + ii_dr + ii_dt + ii_superficial_dt + ii_superficial_ur
-		jj_new = jj_ur + jj_ut + jj_dr + jj_dt + jj_superficial_dt + jj_superficial_ur
+		self.ii = ii_ur + ii_ut + ii_dr + ii_dt + ii_superficial_dt + ii_superficial_ur
+		self.jj = jj_ur + jj_ut + jj_dr + jj_dt + jj_superficial_dt + jj_superficial_ur
 		
 		#ampiezze dei nuovi raggi prodotti
-		y_pi = yur_pi + yut_pi + ydr_pi + ydt_pi + ydt_sup_pi + yur_sup_pi
-		y_sigma = yur_sigma + yut_sigma + ydr_sigma + ydt_sigma + ydt_sup_sigma + yur_sup_sigma
+		self.y_pi = yur_pi + yut_pi + ydr_pi + ydt_pi + ydt_sup_pi + yur_sup_pi
+		self.y_sigma = yur_sigma + yut_sigma + ydr_sigma + ydt_sigma + ydt_sup_sigma + yur_sup_sigma
+
+
 		
-		#restituisci anche i contributi diretti alle ampiezze in somma_
+		def grandell():
 
-		return ii_new, jj_new, y_pi, y_sigma, somma_pi, somma_sigma
-
-#I = interazione(1)
-#I.inizializza(theta0=45, nc=[1, 1.2, 1.3], strati=3)
-#print(I.Theta)
-#print(I.rho_S)
-#print(I.tau_S)
+			
+		

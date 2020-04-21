@@ -14,7 +14,7 @@ class campione:
 #    ncN =       indice di rifrazione dell'ultimo mezzo, cioe' il subsrato (e' gia' nc1 nel caso
 #                  di un singolo mezzo).
 
-    def __init__(self,nc0,*varargin):
+    def __init__(self,nc0,varargin):
 
         self.spessori = [0]
         self.nc = [nc0]
@@ -39,3 +39,4 @@ class campione:
 
         #print("Gli spessori inseriti sono:",self.spessori)
         #print("Gli nc inseriti sono:",self.nc)
+
