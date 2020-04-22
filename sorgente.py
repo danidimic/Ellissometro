@@ -1,6 +1,6 @@
 '''classe sorgente(E, psi, delta)
 
-Energia =			energia dei fotoni incidenti
+Energia:			energia dei fotoni incidenti
 
 psi_0, delta_0: 	definiscono la polarizzazione iniziale (in termini di 
 					variazione rispetto alla polarizzazione lineare 

@@ -24,10 +24,10 @@ class interazione:
 
 		self.somma_pi = 0
 		self.somma_sigma = 0
-		self.ii
-		self.jj
-		self.y_pi
-		self.y_sigma
+		self.ii = [0]
+		self.jj = [1]
+		self.y_pi = [0]
+		self.y_sigma = [0]
 
 
 
@@ -54,8 +54,7 @@ class interazione:
 		per la luce polarizzata rispettivamente parallelamente e ortogonalmente al piano di incidenza 
 
 		'''
-
-		theta1 = math.asin( nc0*math.sin(theta0)/nc1 )  #angolo di rifrazione
+		theta1 = math.asin( nc0.real*math.sin(theta0)/nc1.real )  #angolo di rifrazione
 
 		r = nc0/nc1
 		a = nc1/nc0*math.cos(theta1)/math.cos(theta0)
@@ -78,7 +77,7 @@ class interazione:
 		le riflessvità e trsmissività rho_X e tau_x necessari 
 		per la funzione propagazione
 		"""
-		Theta.append(theta0)
+		self.Theta.append(theta0)
 		for i in range(self.campione.strati-1):
 			res = self.interfaccia(theta0, self.campione.nc[i], self.campione.nc[i+1])
 			self.Theta.append(res[0])	#angolo di rifrazione
@@ -299,8 +298,3 @@ class interazione:
 		self.y_sigma = yur_sigma + yut_sigma + ydr_sigma + ydt_sigma + ydt_sup_sigma + yur_sup_sigma
 
 
-		
-		def grandell():
-
-			
-		
