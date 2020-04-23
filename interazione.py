@@ -26,9 +26,8 @@ class interazione:
 		self.somma_sigma = 0
 		self.ii = [0]
 		self.jj = [1]
-		self.y_pi = [0]
-		self.y_sigma = [0]
-
+		self.y_sigma = [1]
+		self.y_pi = [self.y_sigma[0]*math.tan(sorgente.psi_0)*cmath.exp(1j*sorgente.delta_0)]
 
 
 	#funzione per angoli rifratti e coefficienti rho, tau per ogni interfaccia 
