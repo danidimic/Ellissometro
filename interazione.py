@@ -26,9 +26,8 @@ class interazione:
 		self.somma_sigma = 0
 		self.ii = [0]
 		self.jj = [1]
-		self.y_pi = [0]
-		self.y_sigma = [0]
-
+		self.y_sigma = [1]
+		self.y_pi = [self.y_sigma[0]*math.tan(sorgente.psi_0)*cmath.exp(1j*sorgente.delta_0)]
 
 
 	#funzione per angoli rifratti e coefficienti rho, tau per ogni interfaccia 
@@ -89,7 +88,7 @@ class interazione:
 
 
 	#funzione per propagare i raggi luminosi
-	def propagazione():	#TODO parametri devono essere passati da campione o sorgente
+	def propagazione(self):	#TODO parametri devono essere passati da campione o sorgente
 		"""
 		Parameters (molti saranno nella classe "campione")
 		----------
@@ -126,8 +125,10 @@ class interazione:
 		ii = self.ii
 		jj = self.jj
 
-		omega=2*math.pi*sorgente.energia/h;
+		omega=2*math.pi*(self.sorgente.energia)/h;
 		wsuc=omega/c;
+        
+		print(x_pi)
 
 		indici_raggi_su = [] #lista degli indici
 		indici_raggi_giù = []
@@ -156,11 +157,13 @@ class interazione:
 		phase = 0 #solo di supporto per i conti
 		
 		#individuo i raggi che salgono e quelli che scendono
-		for x in range (0, nraggi): #ci va un +1? 
+		for x in range (0, nraggi): #ci va un +1?
+		    print(x_pi[x])
 		    
 		    #elimino raggi troppo flebili
 		    if abs(x_pi[x])+abs(x_sigma[x])>self.precisione:
-		            
+		        #print("ii_superficial all'ingresso': ", ii_superficial_dt, ii_superficial_ur)
+		           
 		        #se i raggi sono nel mezzo, ho un raggio riflesso, che risolvo subito, e uno trasmesso sotto
 		        if ii[x] == 0 and jj[x] == 1:
 		            self.somma_pi += x_pi[x]*self.rho_P[0]
@@ -168,6 +171,7 @@ class interazione:
 		            #devo aggiungere il raggio trasmesso che viene prodotto (avrà ii=1, jj=2)
 		            ii_superficial_dt.append(1)
 		            jj_superficial_dt.append(2)
+		            #print("ii_superficial: ", ii_superficial_dt, ii_superficial_ur)
 		            
 		            phase = (-wsuc*(spessori[1])/np.cos(self.Theta[1]))*nc[1] #CONTROLLA COME INDICIZZI GLI STRATI E THETA!!!!!!!!
 		            
@@ -297,4 +301,7 @@ class interazione:
 		self.y_pi = yur_pi + yut_pi + ydr_pi + ydt_pi + ydt_sup_pi + yur_sup_pi
 		self.y_sigma = yur_sigma + yut_sigma + ydr_sigma + ydt_sigma + ydt_sup_sigma + yur_sup_sigma
 
-
+		#print("somma_sigma: ", self.somma_sigma)
+		#print("ii_superficial: ", ii_superficial_dt, ii_superficial_ur)
+		#print("ii: ", self.ii)
+        

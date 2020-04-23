@@ -26,21 +26,24 @@ class ellissometro:
 		cont = f.readlines()
 		for i in range(len(cont)):
 			cont[i] = float(cont[i])
+			#print(cont[i])
 
 		sorg = sorgente(cont[0], cont[1], cont[2])
 
-		inter = interazione(0.1, camp, sorg)
+		inter = interazione(0.01, camp, sorg)
 		inter.inizializza(math.pi/4)
+		#print('funzia')
 
-		while (len(inter.ii)==0):
+		while (len(inter.ii)!=0):
+			#print('funzia')
 			inter.propagazione()
 
 		r_pi = inter.somma_pi/(math.tan(sorg.psi_0)*cmath.exp(1j*sorg.delta_0))
 		r_sigma = inter.somma_sigma
-		print(inter.somma_sigma)
+		#print(inter.somma_sigma)
 
-		psi1 = math.atan( abs(r_pi/r_sigma) );
-		delta1 = -angle( r_pi/r_sigma );
+		#psi1 = math.atan( abs(r_pi/r_sigma) );
+		#delta1 = -angle( r_pi/r_sigma );
 
 		# psi1=atan(abs(r_sigma./r_pi));
 		# delta1=angle(r_sigma./r_pi);
