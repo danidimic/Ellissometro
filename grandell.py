@@ -30,8 +30,8 @@ class ellissometro:
 
 		sorg = sorgente(cont[0], cont[1], cont[2])
 
-		inter = interazione(0.01, camp, sorg)
-		inter.inizializza(math.pi/4)
+		inter = interazione(0.0001, camp, sorg)
+		inter.inizializza(0.2)
 		#print('funzia')
 
 		while (len(inter.ii)!=0):
@@ -42,12 +42,20 @@ class ellissometro:
 		r_sigma = inter.somma_sigma
 		#print(inter.somma_sigma)
 
-		#psi1 = math.atan( abs(r_pi/r_sigma) );
-		#delta1 = -angle( r_pi/r_sigma );
+		psi1 = math.atan( abs(r_pi/r_sigma) );
+		delta1 = -cmath.phase( r_pi/r_sigma );
+        
+		if delta1<0:
+			delta1= delta1 + 2*math.pi
 
-		# psi1=atan(abs(r_sigma./r_pi));
-		# delta1=angle(r_sigma./r_pi);
-		#delta1=2*pi*(delta1<0)+delta1;
-
-E = ellissometro(1)
+		#psi1=math.atan(abs(r_sigma./r_pi));
+		#delta1=angle(r_sigma./r_pi);v#delta1=2*pi*(delta1<0)+delta1;
+		print('r_pi = ', r_pi)
+		print('r_sigma = ', r_sigma)
+		print('delta1 = ', delta1)
+		print('psi1 = ', psi1)
+        
+E = ellissometro(0.0001)
 E.grandell()
+
+

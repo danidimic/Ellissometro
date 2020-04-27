@@ -77,14 +77,13 @@ class interazione:
 		per la funzione propagazione
 		"""
 		self.Theta.append(theta0)
-		for i in range(self.campione.strati-1):
+		for i in range(self.campione.strati+1):
 			res = self.interfaccia(theta0, self.campione.nc[i], self.campione.nc[i+1])
 			self.Theta.append(res[0])	#angolo di rifrazione
 			self.tau_S.append(res[1]) 	#trasmissività ortogonale
 			self.rho_S.append(res[2])	#riflessività ortogonale
 			self.tau_P.append(res[3])	#trasmissività parallela
 			self.rho_P.append(res[4])	#riflessività parallela
-
 
 
 	#funzione per propagare i raggi luminosi
@@ -121,6 +120,9 @@ class interazione:
 
 		x_pi = self.y_pi
 		x_sigma = self.y_sigma
+        
+		#print(x_pi[0])
+		#print(abs(x_pi[0]))
 		
 		ii = self.ii
 		jj = self.jj
@@ -128,7 +130,7 @@ class interazione:
 		omega=2*math.pi*(self.sorgente.energia)/h;
 		wsuc=omega/c;
         
-		print(x_pi)
+		#print(self.sorgente.energia)
 
 		indici_raggi_su = [] #lista degli indici
 		indici_raggi_giù = []
@@ -150,7 +152,8 @@ class interazione:
 		yur_sup_sigma = []
 		ydt_sup_pi = []
 		ydt_sup_sigma = []
-		
+        
+		contact = 0
 		#self.somma_pi = 0
 		#self.somma_sigma = 0
 		
@@ -158,14 +161,19 @@ class interazione:
 		
 		#individuo i raggi che salgono e quelli che scendono
 		for x in range (0, nraggi): #ci va un +1?
-		    print(x_pi[x])
+		    #print(x_pi[x])
 		    
 		    #elimino raggi troppo flebili
+		    #numero_di_prova = abs(x_pi[0])+abs(x_sigma[0])
+		    #print(numero_di_prova)
 		    if abs(x_pi[x])+abs(x_sigma[x])>self.precisione:
 		        #print("ii_superficial all'ingresso': ", ii_superficial_dt, ii_superficial_ur)
 		           
 		        #se i raggi sono nel mezzo, ho un raggio riflesso, che risolvo subito, e uno trasmesso sotto
 		        if ii[x] == 0 and jj[x] == 1:
+		            #print(x)                    
+		            #print(x_pi)
+		            #print(self.rho_P)
 		            self.somma_pi += x_pi[x]*self.rho_P[0]
 		            self.somma_sigma += x_sigma[x]*self.rho_S[0]  
 		            #devo aggiungere il raggio trasmesso che viene prodotto (avrà ii=1, jj=2)
@@ -182,6 +190,8 @@ class interazione:
 		            
 		        #se sono nel primo strato e stanno salendo ho un raggio trasmesso, ...idem
 		        elif ii[x] == 1 and jj[x] == 0:
+		            contact = contact +1
+		            print('contact', contact)
 		            self.somma_pi += x_pi[x]*self.tau_P[x]
 		            self.somma_sigma += x_sigma[x]*self.tau_S[0] #vedi formule coefficienti di Fresnel!
 		            #devo aggiungere il raggio che manca (come prima)
@@ -205,6 +215,7 @@ class interazione:
 		                itau_sigma[x] = self.tau_S[jj[x]]
 		            elif ii[x] < jj[x] and ii[x] < strati+1: #non analizzo più i raggi che vanno nel substrato
 		                indici_raggi_giù.append(x)
+		                print(self.rho_P)
 		                irho_pi[x] = self.rho_P[ii[x]]
 		                irho_sigma[x] = self.rho_S[ii[x]]
 		                itau_pi[x] = self.tau_P[ii[x]]
@@ -281,6 +292,8 @@ class interazione:
 		    jj_dr[x] = ii[indici_raggi_giù[x]]-1
 		        
 		    #vengono prodotti raggi trasmessi
+		    print('indici giù ', indici_raggi_giù)
+		    print(spessori)
 
 		    phase = (-wsuc*(spessori[ii[indici_raggi_giù[x]]+1])/np.cos(self.Theta[ii[indici_raggi_giù[x]]+1]))*nc[ii[indici_raggi_giù[x]]+1]
 		    
@@ -301,7 +314,8 @@ class interazione:
 		self.y_pi = yur_pi + yut_pi + ydr_pi + ydt_pi + ydt_sup_pi + yur_sup_pi
 		self.y_sigma = yur_sigma + yut_sigma + ydr_sigma + ydt_sigma + ydt_sup_sigma + yur_sup_sigma
 
-		#print("somma_sigma: ", self.somma_sigma)
+		print("somma_sigma: ", self.somma_sigma)
+		print("somma_pi: ", self.somma_pi)
 		#print("ii_superficial: ", ii_superficial_dt, ii_superficial_ur)
-		#print("ii: ", self.ii)
-        
+		print("ii: ", self.ii)
+		print("jj: ", self.jj)  

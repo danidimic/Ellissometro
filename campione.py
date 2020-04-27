@@ -26,6 +26,7 @@ class campione:
         for count in range(0,self.strati):
             self.nc.append(varargin[2*count])
             self.spessori.append(varargin[2*count+1])
+        self.spessori.append(0) #MOSSA MAGICA
 
         self.nc.append(varargin[-1])
 
