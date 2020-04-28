@@ -49,10 +49,10 @@ class ellissometro:
 			delta1= delta1 + 2*math.pi
 
 		#print()
-		print('r_pi = ', r_pi)
-		print('r_sigma = ', r_sigma)
-		print('delta1 = ', delta1)
-		print('psi1 = ', psi1)
+		#print('r_pi = ', r_pi)
+		#print('r_sigma = ', r_sigma)
+		#print('delta1 = ', delta1)
+		#print('psi1 = ', psi1)
 
 		results = [r_pi, r_sigma, delta1, psi1]
 		return results

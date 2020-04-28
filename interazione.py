@@ -55,7 +55,7 @@ class interazione:
 
 		'''
 		theta1 = cmath.asin( nc0*cmath.sin(theta0)/nc1 )  #angolo di rifrazione
-#		print(theta1)
+		#print(theta1)
 
 		r = nc0/nc1
 		a = nc1/nc0*cmath.cos(theta1)/cmath.cos(theta0)
@@ -66,8 +66,8 @@ class interazione:
 		
 		tau_sigma = 2/(1+a)		  #trasmissività ortogonale
 		tau_pi = 2*r/(1+b);		  #trasmissività parallela
-		print('theta1: ',theta1)        
-		print('theta0: ',theta0)
+		#print('theta1: ',theta1)        
+		#print('theta0: ',theta0)
 	
 		return [theta1, tau_sigma, rho_sigma, tau_pi, rho_pi]
 
