@@ -35,8 +35,8 @@ class campione:
                 self.nc[count] = - self.nc[count]
 
         for count in range(0,len(self.nc)):
-            if self.nc[count].imag > 0:
-                self.nc[count] = self.nc[count].conjugate()
+        	if self.nc[count].imag > 0:
+        		self.nc[count] = self.nc[count].conjugate()
 
         #print("Gli spessori inseriti sono:",self.spessori)
         #print("Gli nc inseriti sono:",self.nc)
