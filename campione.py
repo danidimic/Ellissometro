@@ -21,7 +21,6 @@ class campione:
         self.strati=( (len(varargin)-1) / 2 )
 
         self.strati=int(self.strati)
-        #print("Numero di strati:",self.strati)
 
         for count in range(0,self.strati):
             self.nc.append(varargin[2*count])
@@ -37,7 +36,3 @@ class campione:
         for count in range(0,len(self.nc)):
         	if self.nc[count].imag > 0:
         		self.nc[count] = self.nc[count].conjugate()
-
-        #print("Gli spessori inseriti sono:",self.spessori)
-        #print("Gli nc inseriti sono:",self.nc)
-

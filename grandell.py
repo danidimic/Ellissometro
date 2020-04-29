@@ -6,30 +6,47 @@ from campione import campione
 from sorgente import sorgente
 from interazione import interazione
 
+c=299792458; #(m/s);
+h=4.13566743e-15; #(eV s)
 
 class ellissometro:
 		
-	def __init__(self, precisione, theta0):
+	def __init__(self, precisione):
 		self.precisione = precisione
-		self.theta0 = theta0
 
-	def grandell(self):
-
+	def grandell(self, theta0, write=False):
+		#lettura dei dati del campione
 		f = open("campione.txt", 'r')
 		cont = f.readlines()
 		for i in range(len(cont)):
 			cont[i] = complex(cont[i])
+		#inizializzo il campione
+		camp = campione(cont[0], cont[1:] )
 
-		camp = campione(cont[0], cont[1:] ) 
-
+		#lettura dei dati della sorgente
 		f = open("sorgente.txt", 'r')
 		cont = f.readlines()
 		for i in range(len(cont)):
 			cont[i] = float(cont[i])
-
+		#inizializzo la sorgente
 		sorg = sorgente(cont[0], cont[1], cont[2])
 
-		inter = interazione(0.1, camp, sorg, self.theta0)
+		#stampo le caratteristiche di campione e sorgente
+		if write==True:
+			print("Analisi delle grandezze elissometriche del seguente campione")
+			print("numero di strati: ", camp.strati)
+			print("indice di rifrazione iniziale: ", camp.nc[0])
+			for i in range(camp.strati):
+				print("indice di rifrazione dello strato", i+1, ": ", camp.nc[i+1])
+				print("spessore dello strato", i+1, ": ", camp.spessori[i+1])
+			print()
+			print("Caratteristiche della sorgente usata per l'analisi")
+			print("lunghezza d'onda: ", h*c/sorg.energia, " m")
+			print("Psi_0: ", sorg.psi_0)
+			print("delta_0: ", sorg.delta_0)
+	
+			
+		inter = interazione(0.1, camp, sorg, theta0)
 		inter.inizializza()
 
 		while (len(inter.ii)!=0):
@@ -41,22 +58,8 @@ class ellissometro:
 		psi1 = math.atan( abs(r_pi/r_sigma) );
 		delta1 = -cmath.phase( r_pi/r_sigma );
 
-		#psi1=math.atan(abs(r_sigma./r_pi));
-		#delta1=angle(r_sigma./r_pi);
-		#delta1=2*pi*(delta1<0)+delta1;
-        
 		if delta1<0:
 			delta1= delta1 + 2*math.pi
 
-		#print()
-		#print('r_pi = ', r_pi)
-		#print('r_sigma = ', r_sigma)
-		#print('delta1 = ', delta1)
-		#print('psi1 = ', psi1)
-
 		results = [r_pi, r_sigma, delta1, psi1]
 		return results
-
- 
-E = ellissometro(0.1, 0.2)
-E.grandell()
