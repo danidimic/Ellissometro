@@ -76,7 +76,27 @@ class stokes_vector:
 		return [psi, chi]
 
 
-v = stokes_vector()
-v.unpolarized(1)
-print( v.polarization_degree() )
+	#Parametri ellissometrici per luce polarizzata a 45°
+	#NON SO QUANTO SIA CORRETTO
+	def ellipsometric_parameters(self):
+		S1 = self.parameters[1]	
+		S2 = self.parameters[2]		
+		S3 = self.parameters[3]
 
+		delta = np.arctan(-S3/S2)
+		psi = 0.5*np.arctan(np.sqrt(S2**2+S3**2)/-S1)
+		return [psi, delta]
+
+
+	#Prodotto per una matrice mueller
+	def mueller_product(self, mat):
+		product = np.dot(mat, self.parameters)
+		self.parameters = product
+
+	#Interazione del vettore di Stokes con uno strato del campione
+	#dato nell'ordine da riflessione, propagazione e trasmissione
+	def layer_interaction(self, M_ref, M_trasm, M_layer):
+		#matrice totale per l'interazione con lo strato
+		Mtot = np.dot( M_trasm, np.dot(M_layer, M_ref) )
+
+		self.mueller_product(Mtot)

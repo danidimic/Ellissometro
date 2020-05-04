@@ -38,6 +38,7 @@ class MM:
         self.wsuc=wsuc
         self.spessore=spessore
         
+
     def mueller_reflection(self):
         nc0=self.nc0
         nc1=self.nc1
@@ -69,6 +70,7 @@ class MM:
         M[3,2] = Rps.imag
         return M
    
+
     def mueller_transmission(self):
         nc0=self.nc0
         nc1=self.nc1
@@ -100,8 +102,8 @@ class MM:
         M[3,2] = Tps.imag
         return M
     
+
     def mueller_layer(self):
-        
         #ATTENZIONE: uso theta0 e n0 in modo da poter considerare anche gli 
         #effetti del primo mezzo (aria). Eventualmente si può cambiare.
         
@@ -114,8 +116,3 @@ class MM:
         M[3,3] = attenuazione
         
         return M
-    
-m = MM(1+0.0001j,1.5-0.000002j,pi/6, 0.5, 0.1)
-print(m.mueller_layer())
-
-        
