@@ -26,29 +26,36 @@ def covariance_matrix(mat):
 		for j in range(4):
 			Pij = A * np.kron( PauliMat[i], np.conj(PauliMat[j]) ) * Ainv
 			H += 1./4. * mat[i][j] * Pij
-
+			#print(H)
 	return H
 
 
 #Calcolo il vettore covariante data la matrice covarianza
 def covariance_vector(H):
-	h = np.zeros(4)
+
+	h = np.zeros(4, dtype=np.complex64)
 	rank = np.linalg.matrix_rank(H)
 
-	#Se la matrice è di rango=1 c'è un solo autovalore non nullo
+    #Se la matrice è di rango=1 c'è un solo autovalore non nullo
 	if rank==1 :
 		eigvals, eigvecs = la.eig(H)
 
 		for i in range(4):
+			#print(eigvals[i])
 			if abs(eigvals[i]) > 1e-5 :
 				indexeig = i
 
-		h = eigvecs[indexeig]
-		norm = la.norm(h)
+        #l'autovettore è scritto come vettore colonna
+		h[0] = eigvecs[0][indexeig]
+		h[1] = eigvecs[1][indexeig]
+		h[2] = eigvecs[2][indexeig]
+		h[3] = eigvecs[3][indexeig]
+            
+		norm = la.norm(h) #inutile? (la.eig li restituisce già normalizzati)
+		print("norma: ", norm)
 		h /= np.sqrt(norm)
-
+            
 	return h
-
 
 #Calcolo la matrice Z dal vettore covariante
 def Zeta_matrix(h):
@@ -71,17 +78,33 @@ M = [[30., 8., 4., 12.],
 	[12., 0., 12., 26.],
 	[4., 8., -22., 12.]]
 
-for i in range(4):
-	for j in range(4):
-		M[i][j] /= 30.
+M = np.dot((1./30.),M)
+
+#for i in range(4):
+#	for j in range(4):
+#		M[i][j] /= 30.
 
 H = covariance_matrix(M)
 h = covariance_vector(H)
 Z = Zeta_matrix(h)
 
-print(np.asmatrix(M))
+H_visual = np.dot(30.,H)
+h_visual = np.dot(np.sqrt(600),h)
+Z_visual = np.dot(np.sqrt(600),Z)
+
+#print("matrice di Mueller: ")
+#print(np.asmatrix(M))
+#print()
+#print("matrice di covarianza *30: ")
+#print(np.asmatrix(H_visual))
+print("vettore h *sqrt(600):")
+print(h_visual)
 print()
-print(Z*np.conj(Z))
+print("matrice Z *sqrt(600): ")
+print(np.asmatrix(Z_visual))
+print()
+print("verifica: M = ZZ* (*30)")
+print(np.dot(30.,Z*np.conj(Z)))
 print()
 print(np.conj(Z)*Z)
 
