@@ -16,7 +16,7 @@ class Biquaternion:
 		return rep
 
 	def scalar_prod(self, other):
-		return self.R*other.R + self.I*other.I + self.J*other.J + self.K*other.K
+		return self.R*other.R - self.I*other.I - self.J*other.J - self.K*other.K
             
 
 q = Biquaternion(1, 3+1j, 2j, 0)
