@@ -23,6 +23,15 @@ class stokes_vector:
 	def __init__(self):
 		self.parameters = []
 
+	def __str__(self):
+		rep = "Vettore di Stokes di componenti: \n"
+		rep += "I = " + str(self.parameters[0]) + "\n"
+		rep += "Q = " + str(self.parameters[1]) + "\n"
+		rep += "U = " + str(self.parameters[2]) + "\n"
+		rep += "V = " + str(self.parameters[3])
+		return rep
+
+
 	#generica polarizzazione
 	def generic_polarization(self, E0x, E0y, deltax=0, deltay=0):
 		delta = deltay - deltax
@@ -100,3 +109,7 @@ class stokes_vector:
 		Mtot = np.dot( M_trasm, np.dot(M_layer, M_ref) )
 
 		self.mueller_product(Mtot)
+
+v = stokes_vector()
+v.linear_polarization(1, pi/4)
+print(v)
