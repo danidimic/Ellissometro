@@ -7,29 +7,35 @@ h=4.13566743e-15; #(eV s)
 pi=math.pi
 
 class MM:
-    
-    #   
-    #      *
-    #        *
-    #          *
-    #  __________*________________________________
-    #              \         :         /
-    #   S           \        :        /
-    #   P            \theta0 :       /
-    #   E             \      :      /
-    #   S              \     :     /
-    #   S               \    :    /           nc0
-    #   O                \   :   /
-    #   R                 \  :  /
-    #   E                  \ : /
-    #  _____________________\:/___________________
-    #                        :*
-    #                        :  *
-    #                        :    *
-    #                        :      *         nc1
-    #                        : theta1 *
-    #                        :          *
-
+    '''
+    Classe Mueller matrix:
+    permette di costruire le matrici di Mueller per la riflessione, la
+    trasmissione, e la propagazione attraverso uno strato di materiale di 
+    indice di rifrazione "n0" e il cui spessore è indicato nella variabile 
+    "spessore". Per il momento, si suppone che il materiale non depolarizzi 
+    la luce.
+       
+          *
+            *
+              *
+      __________*________________________________
+                  \         :         /
+       S           \        :        /
+       P            \theta0 :       /
+       E             \      :      /
+       S              \     :     /
+       S               \    :    /           nc0
+       O                \   :   /
+       R                 \  :  /
+       E                  \ : /
+      _____________________\:/___________________
+                            :*
+                            :  *
+                            :    *
+                            :      *         nc1
+                            : theta1 *
+                            :          *
+    '''
     
     def __init__(self, nc0, nc1, theta0, wsuc, spessore):
         self.nc0=nc0
