@@ -2,6 +2,7 @@ import math
 import cmath
 import numpy as np
 import scipy.linalg as la
+from pyquaternion import Quaternion
 
 pi=math.pi
 
@@ -26,7 +27,6 @@ def covariance_matrix(mat):
 		for j in range(4):
 			Pij = A * np.kron( PauliMat[i], np.conj(PauliMat[j]) ) * Ainv
 			H += 1./4. * mat[i][j] * Pij
-			#print(H)
 	return H
 
 
@@ -41,7 +41,6 @@ def covariance_vector(H):
 		eigvals, eigvecs = la.eig(H)
 
 		for i in range(4):
-			#print(eigvals[i])
 			if abs(eigvals[i]) > 1e-5 :
 				indexeig = i
 
@@ -52,7 +51,6 @@ def covariance_vector(H):
 		h[3] = eigvecs[3][indexeig]
             
 		norm = la.norm(h) #inutile? (la.eig li restituisce già normalizzati)
-		print("norma: ", norm)
 		h /= np.sqrt(norm)
             
 	return h
@@ -71,7 +69,23 @@ def Zeta_matrix(h):
 
 	return Z
 
+#Definisco h tramite quaternioni
+def h_quaternion(h):
+	t = h[0]
+	a = h[1]
+	b = h[2]
+	c = h[3]
 
+	qh = Quaternion(t, 1j*a, 1j*b, 1j*c)
+	return qh
+
+
+
+
+
+
+
+#########################################
 #prova di calcolo con risultato a pag 85
 M = [[30., 8., 4., 12.],
 	[8., 26., 8., 0.],
@@ -80,32 +94,27 @@ M = [[30., 8., 4., 12.],
 
 M = np.dot((1./30.),M)
 
-#for i in range(4):
-#	for j in range(4):
-#		M[i][j] /= 30.
-
 H = covariance_matrix(M)
 h = covariance_vector(H)
 Z = Zeta_matrix(h)
+qh = h_quaternion(h)
+qh_conj = qh.conjugate
 
-H_visual = np.dot(30.,H)
-h_visual = np.dot(np.sqrt(600),h)
-Z_visual = np.dot(np.sqrt(600),Z)
-
-#print("matrice di Mueller: ")
-#print(np.asmatrix(M))
-#print()
-#print("matrice di covarianza *30: ")
-#print(np.asmatrix(H_visual))
-print("vettore h *sqrt(600):")
-print(h_visual)
+print("vettore h:")
+print(h)
 print()
-print("matrice Z *sqrt(600): ")
-print(np.asmatrix(Z_visual))
+print("matrice Z: ")
+print(np.asmatrix(Z))
 print()
-print("verifica: M = ZZ* (*30)")
-print(np.dot(30.,Z*np.conj(Z)))
+print("verifica: M = ZZ*")
+print(Z*np.conj(Z))
 print()
 print(np.conj(Z)*Z)
+print()
+print("matrice M")
+print(M)
 
+print()
+print(qh)
+print(qh_conj)
 
