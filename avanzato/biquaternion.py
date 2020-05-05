@@ -25,11 +25,23 @@ class Biquaternion:
 		k1 = 1j * ( self.R*other.K + self.K*other.R + 1j*self.I*other.J - 1j*self.J*other.I )
 		return Biquaternion(r1,i1,j1,k1)
             
+	def exp(self):
+        # exp(q) = e^a(cos||v|| + v/||v||*sin||v||)
+		q = self
+		vector_norm = np.sqrt(q.I**2 + q.J**2 + q.K**2)
+		r = np.exp(q.R) * np.cos(vector_norm)
+		i = np.exp(q.R) * np.sin(vector_norm) * q.I / vector_norm
+		j = np.exp(q.R) * np.sin(vector_norm) * q.J / vector_norm
+		q = np.exp(q.R) * np.sin(vector_norm) * q.K / vector_norm
+        
+		return Biquaternion(r, i, j, q)
 
+    
 q = Biquaternion(1, 3+1j, 2j, 0)
-k = Biquaternion(0, 1, 1j, 2)
+k = Biquaternion(7, 1j, 1j, 2)
 scalar = q.scalar_prod(k)
-print(scalar)
+exp_= k.exp()
+print(exp_)
 
 		
 
