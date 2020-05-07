@@ -43,6 +43,7 @@ class MM:
         self.theta0=theta0
         self.wsuc=wsuc
         self.spessore=spessore
+        self.theta1 = math.asin( nc0.real*math.sin(theta0)/nc1.real )
         
 
     def mueller_reflection(self):
@@ -50,7 +51,7 @@ class MM:
         nc1=self.nc1
         theta0=self.theta0
         
-        theta1 = math.asin( nc0.real*math.sin(theta0)/nc1.real )  #angolo di rifrazione
+        theta1 = self.theta1  #angolo di rifrazione
         r = nc0/nc1
         a = nc1/nc0*math.cos(theta1)/math.cos(theta0)
         b = (r**2)*a
@@ -82,7 +83,7 @@ class MM:
         nc1=self.nc1
         theta0=self.theta0
         
-        theta1 = math.asin( nc0.real*math.sin(theta0)/nc1.real )
+        theta1 = self.theta1
         r = nc0/nc1
         a = nc1/nc0*math.cos(theta1)/math.cos(theta0)
         b = (r**2)*a
@@ -114,11 +115,12 @@ class MM:
         #effetti del primo mezzo (aria). Eventualmente si può cambiare.
         
         phase = self.wsuc*self.nc0*(self.spessore/np.cos(self.theta0))
+        #print('phase: ',phase)
         attenuazione = abs(np.exp(-1j*phase))
+        #print('attenuazione: ', attenuazione)
         M = np.zeros( (4,4) )
         M[0,0] = attenuazione
         M[1,1] = attenuazione
         M[2,2] = attenuazione
         M[3,3] = attenuazione
-        
         return M
