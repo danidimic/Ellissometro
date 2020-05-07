@@ -43,7 +43,7 @@ class MM:
         self.theta0=theta0
         self.wsuc=wsuc
         self.spessore=spessore
-        self.theta1 = math.asin( nc0.real*math.sin(theta0)/nc1.real )
+        self.theta1 = cmath.asin( nc0.real*cmath.sin(theta0)/nc1.real )
         
 
     def mueller_reflection(self):
@@ -53,7 +53,7 @@ class MM:
         
         theta1 = self.theta1  #angolo di rifrazione
         r = nc0/nc1
-        a = nc1/nc0*math.cos(theta1)/math.cos(theta0)
+        a = nc1/nc0*cmath.cos(theta1)/cmath.cos(theta0)
         b = (r**2)*a
         
         rho_sigma = (1-a)/(1+a);  #riflessività ortogonale
@@ -85,7 +85,7 @@ class MM:
         
         theta1 = self.theta1
         r = nc0/nc1
-        a = nc1/nc0*math.cos(theta1)/math.cos(theta0)
+        a = nc1/nc0*cmath.cos(theta1)/cmath.cos(theta0)
         b = (r**2)*a
         
         tau_sigma = 2/(1+a);  #coefficiente di trasmissione onda s

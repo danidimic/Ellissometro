@@ -110,6 +110,7 @@ class stokes_vector:
 
 		self.mueller_product(Mtot)
 
-v = stokes_vector()
-v.linear_polarization(1, pi/4)
-print(v)
+#PROVA
+#v = stokes_vector()
+#v.linear_polarization(1, pi/4)
+#print(v)

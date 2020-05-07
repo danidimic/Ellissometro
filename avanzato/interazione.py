@@ -8,7 +8,7 @@ import pandas as pd
 from sorgente import sorgente
 from campione import campione
 from matrix import *
-from biquaternion import Biquaternion
+from sympy.algebras.quaternion import Quaternion
 
 c=299792458; #(m/s);
 h=4.13566743e-15; #(eV s)
@@ -54,7 +54,6 @@ class interazione:
         self.precisione = precisione
         
         self.theta0 = theta0
-        self.precisione = precisione
         
         #inizializzo un Data Frame dove metterò le matrici di Mueller
         righe = np.arange(0, self.campione.strati + 1) #il vuoto è lo strato 0
@@ -127,17 +126,58 @@ class interazione:
             h_tra_dw = covariance_vector(H_tra_dw)
             h_tra_up = covariance_vector(H_tra_up)
             
-            print(h_mat) #NOTA: h_mat è autovettore di una matrice multipla dell'identità
+            #print(H_rif) #NOTA: h_mat è autovettore di una matrice multipla dell'identità
             print()
             
-            biq_mat = Biquaternion(h_mat[0], h_mat[1], h_mat[2], h_mat[3])
-            biq_rif = Biquaternion(h_rif[0], h_rif[1], h_rif[2], h_rif[3])
-            biq_tra_dw = Biquaternion(h_tra_dw[0], h_tra_dw[1], h_tra_dw[2], h_tra_dw[3])
-            biq_tra_up = Biquaternion(h_tra_up[0], h_tra_up[1], h_tra_up[2], h_tra_up[3])
+            self.biquaternions.loc[i, 'h_mat'] = Quaternion(h_mat[0], h_mat[1]*1j, h_mat[2]*1j, h_mat[3]*1j)
+            self.biquaternions.loc[i, 'h_rif'] = Quaternion(h_rif[0], h_rif[1]*1j, h_rif[2]*1j, h_rif[3]*1j)
+            self.biquaternions.loc[i, 'h_tra_dw'] = Quaternion(h_tra_dw[0], h_tra_dw[1]*1j, h_tra_dw[2]*1j, h_tra_dw[3]*1j)
+            self.biquaternions.loc[i, 'h_tra_up'] = Quaternion(h_tra_up[0], h_tra_up[1]*1j, h_tra_up[2]*1j, h_tra_up[3]*1j)
 '''prova'''
 
-my_campione = campione(1.1, [2.1+0.00000001j,0.02, 4.1+0.00000002j,0.04, 5.1+0.00000003j,0.05, 9.1])
-my_sorgente = sorgente(0.3, 0.75, 0.43)
 
-my_interazione = interazione(0.0001, my_campione,my_sorgente, 0.15)
+my_sorgente = sorgente(1.95954488, 1, 0.78539163)
+
+#indici rifrzione
+n0 = 1
+n1 = 2.1+1j
+
+#Brewster angle
+br = np.arctan(n1/n0)
+
+raggio_iniz = stokes_vector()
+raggio_iniz.generic_polarization(1,1.5, 0.12, 0.34)
+
+#print('raggio iniziale: ',raggio_iniz)
+
+my_campione = campione(n0, [n1])
+
+my_interazione = interazione(0.0001, my_campione,my_sorgente, br)
 my_interazione.materials_to_mueller()
+
+raggio_iniz.mueller_product(my_interazione.muellers.loc[0, 'M_rif'])
+#print()
+#print(my_interazione.muellers.loc[0, 'M_rif'])
+#print()
+
+raggio_finale = raggio_iniz
+#print('raggio finale: ',raggio_finale)
+#print()
+#formalismo biquaternioni
+biq_iniz = Quaternion(raggio_iniz.parameters[0], raggio_iniz.parameters[1]*1j, raggio_iniz.parameters[2]*1j, raggio_iniz.parameters[3]*1j)
+h_riflessione = my_interazione.biquaternions.loc[0, 'h_rif']
+
+print('biquaternione riflessione: ',h_riflessione)
+biq_fin = h_riflessione.mul(biq_iniz)
+
+def scalar_prod(q1, q2):
+	return q1.a*q2.a + q1.b*q2.b + q1.c*q2.c + q1.d*q2.d
+
+prodotto_scalare = scalar_prod(biq_iniz, biq_fin)
+total_phase = cmath.phase(prodotto_scalare)
+
+print('hs: ', biq_fin)
+print('prodotto scalare: ',prodotto_scalare)
+
+print(total_phase)
+

@@ -2,7 +2,7 @@ import math
 import cmath
 import numpy as np
 import scipy.linalg as la
-from pyquaternion import Quaternion
+#from pyquaternion import Quaternion
 
 pi=math.pi
 
@@ -69,22 +69,23 @@ def Zeta_matrix(h):
 
 	return Z
 
+#PER ORA TOLTO, USIAMO BIQUATERNIONI
 #Definisco h tramite quaternioni
-def h_quaternion(h):
-	t = h[0]
-	a = h[1]
-	b = h[2]
-	c = h[3]
+#def h_quaternion(h):
+#	t = h[0]
+#	a = h[1]
+#	b = h[2]
+#	c = h[3]
 
-	qh = Quaternion(t, 1j*a, 1j*b, 1j*c)
-	return qh
-
-
+#	qh = Quaternion(t, 1j*a, 1j*b, 1j*c)
+#	return qh
 
 
 
 
 
+
+"""
 #########################################
 #prova di calcolo con risultato a pag 85
 M = [[30., 8., 4., 12.],
@@ -97,8 +98,8 @@ M = np.dot((1./30.),M)
 H = covariance_matrix(M)
 h = covariance_vector(H)
 Z = Zeta_matrix(h)
-qh = h_quaternion(h)
-qh_conj = qh.conjugate
+#qh = h_quaternion(h)
+#qh_conj = qh.conjugate
 
 print("vettore h:")
 print(h)
@@ -115,6 +116,6 @@ print("matrice M")
 print(M)
 
 print()
-print(qh)
-print(qh_conj)
-
+#print(qh)
+#print(qh_conj)
+"""
