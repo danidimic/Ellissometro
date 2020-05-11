@@ -20,8 +20,8 @@ class stokes_vector:
 	omega è la frequenza angolare 
 	'''
 
-	def __init__(self):
-		self.parameters = []
+	def __init__(self, I=0, Q=0, U=0, V=0):
+		self.parameters = [I, Q, U, V]
 
 	def __str__(self):
 		rep = "Vettore di Stokes di componenti: \n"
@@ -31,6 +31,17 @@ class stokes_vector:
 		rep += "V = " + str(self.parameters[3])
 		return rep
 
+	def I(self):
+		return self.parameters[0]
+
+	def Q(self):
+		return self.parameters[1]
+
+	def U(self):
+		return self.parameters[2]
+
+	def V(self):
+		return self.parameters[3]
 
 	#generica polarizzazione
 	def generic_polarization(self, E0x, E0y, deltax=0, deltay=0):
@@ -76,12 +87,12 @@ class stokes_vector:
 	#Calcolo di Psi, Chi dell'ellisse di polarizzazione
 	def polarization_elipse(self):
 		I = self.parameters[0]
-		Q = self.parameters[1]	
-		U = self.parameters[2]		
-		V = self.parameters[3]	
+		S1 = self.parameters[1]	
+		S2 = self.parameters[2]		
+		S3 = self.parameters[3]	
 
-		psi = 0.5*np.arctan(U/Q)
-		chi = 0.5*np.arctan(V/np.sqrt(Q*Q+U*U))
+		psi = 0.5*np.arctan(S2/S1)
+		chi = 0.5*np.arctan(S3/np.sqrt(S1*S1+S2*S2))
 		return [psi, chi]
 
 

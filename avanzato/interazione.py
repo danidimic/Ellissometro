@@ -16,13 +16,11 @@ h=4.13566743e-15; #(eV s)
 
 class interazione:
     
-    def __init__(self, precisione, campione, sorgente, theta0):
+    def __init__(self, precisione, campione, sorgente):
         
         self.campione = campione
         self.sorgente = sorgente
         self.precisione = precisione
-        
-        self.theta0 = theta0
         
         #inizializzo un Data Frame dove metterò le matrici di Mueller
         righe = np.arange(0, self.campione.strati + 1) #il vuoto è lo strato 0
@@ -36,7 +34,7 @@ class interazione:
         self.biquaternions = self.biquaternions.astype(object)
         
         
-    def materials_to_mueller(self):
+    def materials_to_mueller(self, theta0):
         
         '''
         Raccoglie nel Data Frame, con indici di riga riferiti agli strati (0 
@@ -52,7 +50,7 @@ class interazione:
         wsuc=omega/c;
         
         #Il primo theta è quello con cui la luce parte dalla sorgente
-        theta_start = self.theta0
+        theta_start = theta0
         
         for i in range(self.campione.strati+1):
             
