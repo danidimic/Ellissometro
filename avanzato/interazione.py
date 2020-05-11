@@ -9,41 +9,10 @@ from sorgente import sorgente
 from campione import campione
 from matrix import *
 from sympy.algebras.quaternion import Quaternion
+from sympy import I
 
 c=299792458; #(m/s);
 h=4.13566743e-15; #(eV s)
-
-'''
-n = 100
-pi=math.pi
-theta = np.linspace(0, pi/2, n)
-
-v = stokes_vector()
-v.linear_polarization(1, pi/4)
-
-Psi = []
-Delta = []
-
-for i in range(n):
-	m = MM(1+0j, 1.5+0.00000002j, theta[i], 0.5, 0.00002)
-	mat_ref = m.mueller_reflection()
-	mat_tra = m.mueller_transmission()
-	mat_lay = m.mueller_layer()
-	
-	v.layer_interaction(mat_ref, mat_tra, mat_lay)
-
-	psi, delta = v.ellipsometric_parameters()
-
-	Psi.append(psi)
-	Delta.append(delta)	
-
-
-plt.plot(theta, Psi, label="$\Psi$")
-plt.plot(theta, Delta, label="$\Delta$")
-plt.legend()
-plt.grid(True)
-plt.show()
-'''
 
 class interazione:
     
@@ -114,11 +83,18 @@ class interazione:
             #print()
            
         for i in range(self.campione.strati+1):
+            
+            #normalizzo le matrici di Mueller
+            M_mat_nr = normalize(self.muellers.loc[i, 'M_mat'])
+            M_rif_nr = normalize(self.muellers.loc[i, 'M_rif'])
+            M_tra_dw_nr = normalize(self.muellers.loc[i, 'M_tra_dw'])
+            M_tra_up_nr = normalize(self.muellers.loc[i, 'M_tra_up'])
+            
             #calcolo matrici di covarianza
-            H_mat = covariance_matrix(self.muellers.loc[i, 'M_mat'])
-            H_rif = covariance_matrix(self.muellers.loc[i, 'M_rif'])
-            H_tra_dw = covariance_matrix(self.muellers.loc[i, 'M_tra_dw'])
-            H_tra_up = covariance_matrix(self.muellers.loc[i, 'M_tra_up'])
+            H_mat = covariance_matrix(M_mat_nr)
+            H_rif = covariance_matrix(M_rif_nr)
+            H_tra_dw = covariance_matrix(M_tra_dw_nr)
+            H_tra_up = covariance_matrix(M_tra_up_nr)
             
             #calcolo i vettori di covarianza
             h_mat = covariance_vector(H_mat)
@@ -127,57 +103,16 @@ class interazione:
             h_tra_up = covariance_vector(H_tra_up)
             
             #print(H_rif) #NOTA: h_mat è autovettore di una matrice multipla dell'identità
-            print()
+            #print()
             
-            self.biquaternions.loc[i, 'h_mat'] = Quaternion(h_mat[0], h_mat[1]*1j, h_mat[2]*1j, h_mat[3]*1j)
-            self.biquaternions.loc[i, 'h_rif'] = Quaternion(h_rif[0], h_rif[1]*1j, h_rif[2]*1j, h_rif[3]*1j)
-            self.biquaternions.loc[i, 'h_tra_dw'] = Quaternion(h_tra_dw[0], h_tra_dw[1]*1j, h_tra_dw[2]*1j, h_tra_dw[3]*1j)
-            self.biquaternions.loc[i, 'h_tra_up'] = Quaternion(h_tra_up[0], h_tra_up[1]*1j, h_tra_up[2]*1j, h_tra_up[3]*1j)
-'''prova'''
+            self.biquaternions.loc[i, 'h_mat'] = Quaternion(h_mat[0], h_mat[1]*I, h_mat[2]*I, h_mat[3]*I, real_field = False)
+            self.biquaternions.loc[i, 'h_rif'] = Quaternion(h_rif[0], h_rif[1]*I, h_rif[2]*I, h_rif[3]*I, real_field = False)
+            self.biquaternions.loc[i, 'h_tra_dw'] = Quaternion(h_tra_dw[0], h_tra_dw[1]*I, h_tra_dw[2]*I, h_tra_dw[3]*I, real_field = False)
+            self.biquaternions.loc[i, 'h_tra_up'] = Quaternion(h_tra_up[0], h_tra_up[1]*I, h_tra_up[2]*I, h_tra_up[3]*I, real_field = False)
 
-
-my_sorgente = sorgente(1.95954488, 1, 0.78539163)
-
-#indici rifrzione
-n0 = 1
-n1 = 2.1+1j
-
-#Brewster angle
-br = np.arctan(n1/n0)
-
-raggio_iniz = stokes_vector()
-raggio_iniz.generic_polarization(1,1.5, 0.12, 0.34)
-
-#print('raggio iniziale: ',raggio_iniz)
-
-my_campione = campione(n0, [n1])
-
-my_interazione = interazione(0.0001, my_campione,my_sorgente, br)
-my_interazione.materials_to_mueller()
-
-raggio_iniz.mueller_product(my_interazione.muellers.loc[0, 'M_rif'])
-#print()
-#print(my_interazione.muellers.loc[0, 'M_rif'])
-#print()
-
-raggio_finale = raggio_iniz
-#print('raggio finale: ',raggio_finale)
-#print()
-#formalismo biquaternioni
-biq_iniz = Quaternion(raggio_iniz.parameters[0], raggio_iniz.parameters[1]*1j, raggio_iniz.parameters[2]*1j, raggio_iniz.parameters[3]*1j)
-h_riflessione = my_interazione.biquaternions.loc[0, 'h_rif']
-
-print('biquaternione riflessione: ',h_riflessione)
-biq_fin = h_riflessione.mul(biq_iniz)
-
-def scalar_prod(q1, q2):
-	return q1.a*q2.a + q1.b*q2.b + q1.c*q2.c + q1.d*q2.d
-
-prodotto_scalare = scalar_prod(biq_iniz, biq_fin)
-total_phase = cmath.phase(prodotto_scalare)
-
-print('hs: ', biq_fin)
-print('prodotto scalare: ',prodotto_scalare)
-
-print(total_phase)
-
+            
+def normalize(Mueller_mat):
+        M_00 = Mueller_mat[0,0]
+        normalized = Mueller_mat*(1./M_00)
+        return normalized
+    
