@@ -43,6 +43,8 @@ class stokes_vector:
 	def V(self):
 		return self.parameters[3]
 
+
+
 	#generica polarizzazione
 	def generic_polarization(self, E0x, E0y, deltax=0, deltay=0):
 		delta = deltay - deltax
@@ -74,6 +76,7 @@ class stokes_vector:
 	def unpolarized(self, I):
 		self.parameters = [I, 0, 0, 0]
 
+
 	
 	#grado di polarizzazione
 	def polarization_degree(self):
@@ -95,17 +98,20 @@ class stokes_vector:
 		chi = 0.5*np.arctan(S3/np.sqrt(S1*S1+S2*S2))
 		return [psi, chi]
 
+	#Componenti del campo elettrico
+	def electric_components(self):
+		S0 = self.I()
+		S1 = self.Q()
 
-	#Parametri ellissometrici per luce polarizzata a 45°
-	#NON SO QUANTO SIA CORRETTO
-	def ellipsometric_parameters(self):
-		S1 = self.parameters[1]	
-		S2 = self.parameters[2]		
-		S3 = self.parameters[3]
+		Ex = np.sqrt( (S0+S1)/2 )
+		Ey = np.sqrt( (S0-S1)/2 )
+		return [Ex, Ey]
 
-		delta = np.arctan(-S3/S2)
-		psi = 0.5*np.arctan(np.sqrt(S2**2+S3**2)/-S1)
-		return [psi, delta]
+	#Calcolo del parametro ellissometrico Psi
+	def ellipsometric_Psi(self):
+		Ex, Ey = self.electric_components()
+		return np.arctan(Ey/Ex)
+
 
 
 	#Prodotto per una matrice mueller
@@ -121,7 +127,5 @@ class stokes_vector:
 
 		self.mueller_product(Mtot)
 
-#PROVA
-#v = stokes_vector()
-#v.linear_polarization(1, pi/4)
-#print(v)
+
+

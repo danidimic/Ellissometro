@@ -35,9 +35,10 @@ S = []
 Q = []
 U = []
 V = []
-#Liste per risultati quaternioni
 Psi = []
-Delta = []
+#Liste per risultati quaternioni
+Psiq = []
+Deltaq = []
 Sq = []
 Qq = []
 Uq = []
@@ -60,6 +61,7 @@ for i in range(nvalues):
 	Q.append( riniz.Q() )
 	U.append( riniz.U() )
 	V.append( riniz.V() )
+	Psi.append( riniz.ellipsometric_Psi() )
 
 	#Calcolo con formalismo quaternioni
 	riniz.generic_polarization(1, 1.5, 0.12, 0.34)						#vettore di Stokes incidente   
@@ -69,13 +71,14 @@ for i in range(nvalues):
 	shs = scalar_prod(h, hs)*MMrif[0,0]	#prodotto scalare s.hs
 
 	rfin = stokes_vector( complex(hs.a), complex(hs.b*(-1j)), complex(hs.c*(-1j)), complex(hs.d*(-1j)) )  #vettore di Stokes finale
-	Psi.append(rfin.polarization_elipse()[0])
-	Delta.append(cmath.phase(shs))
 	#Salva i risultati con quaternioni
 	Sq.append( rfin.I() )
 	Qq.append( rfin.Q() )
 	Uq.append( rfin.U() )
 	Vq.append( rfin.V() )
+	#Parametri ellissometrici
+	Psiq.append( rfin.ellipsometric_Psi() )
+	Deltaq.append(cmath.phase(shs))
 
 
 
@@ -86,6 +89,7 @@ plt.plot(theta, S , label='I')
 plt.plot(theta, Q , label='Q')
 plt.plot(theta, U , label='U')
 plt.plot(theta, V , label='V')
+plt.plot(theta, Psi, label='$\Psi$', lw=2.5)
 plt.grid(True)
 plt.legend()
 plt.show()
@@ -104,8 +108,8 @@ plt.show()
 #Grafico Psi, Delta
 plt.title("Calcolo tramite quaternioni")
 plt.xlabel("Angolo incidente [rad]")
-plt.plot(theta, Delta, label='$\Delta$')
-plt.plot(theta, Psi, label='$\Psi$')
+plt.plot(theta, Deltaq, label='$\Delta$')
+plt.plot(theta, Psiq, label='$\Psi$')
 plt.grid(True)
 plt.legend()
 plt.show()
