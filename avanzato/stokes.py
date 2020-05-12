@@ -112,7 +112,8 @@ class stokes_vector:
 		Ex, Ey = self.electric_components()
 		return np.arctan(Ey/Ex)
 
-    #da controllare
+	#TODO Da controllare!!
+	#Calcolo del parametro ellissometrico Delta
 	def ellipsometric_Delta(self):
 		x = self.parameters[3]/self.parameters[0]
 
@@ -123,7 +124,7 @@ class stokes_vector:
 		#numeratore = np.tan(np.arcsin(x))
         
 		return numeratore/denominatore
-            
+
 		
 
 	#Prodotto per una matrice mueller
