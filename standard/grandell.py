@@ -13,6 +13,7 @@ class ellissometro:
 		
 	def __init__(self, precisione):
 		self.precisione = precisione
+		self.sorg_val = 0
 
 	def grandell(self, theta0, write=False):
 		#lettura dei dati del campione
@@ -30,6 +31,7 @@ class ellissometro:
 			cont[i] = float(cont[i])
 		#inizializzo la sorgente
 		sorg = sorgente(cont[0], cont[1], cont[2])
+		self.sorg_val = sorg
 
 		#stampo le caratteristiche di campione e sorgente
 		if write==True:
