@@ -25,12 +25,12 @@ class interazione:
         
         #inizializzo un Data Frame dove metterò le matrici di Mueller
         righe = np.arange(0, self.campione.strati + 1) #il vuoto è lo strato 0
-        col = ['M_mat', 'M_rif', 'M_tra_dw', 'M_tra_up']
+        col = ['M_mat', 'M_rif_up', 'M_rif_dw', 'M_tra_dw', 'M_tra_up']
         self.muellers = pd.DataFrame(0, righe, col)
         self.muellers = self.muellers.astype(object)
         
         #inizializzo un Data Frame dove metterò i biquaternioni
-        col = ['h_mat', 'h_rif', 'h_tra_dw', 'h_tra_up']
+        col = ['h_mat', 'h_rif_up', 'h_rif_dw', 'h_tra_dw', 'h_tra_up']
         self.biquaternions = pd.DataFrame(0, righe, col)
         self.biquaternions = self.biquaternions.astype(object)
         
@@ -63,7 +63,7 @@ class interazione:
             
             #assegno le matrici di Mueller al Data Frame:
             self.muellers.loc[i, 'M_mat'] = np.array(mueller_class.mueller_layer())
-            self.muellers.loc[i, 'M_rif'] = np.array(mueller_class.mueller_reflection())
+            self.muellers.loc[i, 'M_rif_dw'] = np.array(mueller_class.mueller_reflection())
             self.muellers.loc[i, 'M_tra_dw'] = np.array(mueller_class.mueller_transmission())
             
             #la matrice di Mueller per la trasmissione per ragggi diretti dal basso verso l'alto è
@@ -74,6 +74,7 @@ class interazione:
             #e me la ricalcolo
             mueller_class = MM(n1, n0, theta_start, wsuc, spessore)
             self.muellers.loc[i, 'M_tra_up'] = np.array(mueller_class.mueller_transmission())
+            self.muellers.loc[i, 'M_rif_up'] = np.array(mueller_class.mueller_reflection())
             
             #print('rif alto a basso: ', mueller_class.mueller_reflection())
             #print('tras alto a basso: ', mueller_class.mueller_transmission())
@@ -86,19 +87,22 @@ class interazione:
             #print('elemento 00: ',self.muellers.loc[i, 'M_rif'][0,0])
             #normalizzo le matrici di Mueller
             M_mat_nr = normalize(self.muellers.loc[i, 'M_mat'])
-            M_rif_nr = normalize(self.muellers.loc[i, 'M_rif'])
+            M_rif_dw_nr = normalize(self.muellers.loc[i, 'M_rif_dw'])
+            M_rif_up_nr = normalize(self.muellers.loc[i, 'M_rif_up'])
             M_tra_dw_nr = normalize(self.muellers.loc[i, 'M_tra_dw'])
             M_tra_up_nr = normalize(self.muellers.loc[i, 'M_tra_up'])
             
             #calcolo matrici di covarianza
             H_mat = covariance_matrix(M_mat_nr)
-            H_rif = covariance_matrix(M_rif_nr)
+            H_rif_dw = covariance_matrix(M_rif_dw_nr)
+            H_rif_up = covariance_matrix(M_rif_up_nr)
             H_tra_dw = covariance_matrix(M_tra_dw_nr)
             H_tra_up = covariance_matrix(M_tra_up_nr)
             
             #calcolo i vettori di covarianza
             h_mat = covariance_vector(H_mat)
-            h_rif = covariance_vector(H_rif)
+            h_rif_dw = covariance_vector(H_rif_dw)
+            h_rif_up = covariance_vector(H_rif_up)
             h_tra_dw = covariance_vector(H_tra_dw)
             h_tra_up = covariance_vector(H_tra_up)
             
@@ -106,7 +110,8 @@ class interazione:
             #print()
             
             self.biquaternions.loc[i, 'h_mat'] = Quaternion(h_mat[0], h_mat[1]*I, h_mat[2]*I, h_mat[3]*I, real_field = False)
-            self.biquaternions.loc[i, 'h_rif'] = Quaternion(h_rif[0], h_rif[1]*I, h_rif[2]*I, h_rif[3]*I, real_field = False)
+            self.biquaternions.loc[i, 'h_rif_dw'] = Quaternion(h_rif_dw[0], h_rif_dw[1]*I, h_rif_dw[2]*I, h_rif_dw[3]*I, real_field = False)
+            self.biquaternions.loc[i, 'h_rif_up'] = Quaternion(h_rif_up[0], h_rif_up[1]*I, h_rif_up[2]*I, h_rif_up[3]*I, real_field = False)
             self.biquaternions.loc[i, 'h_tra_dw'] = Quaternion(h_tra_dw[0], h_tra_dw[1]*I, h_tra_dw[2]*I, h_tra_dw[3]*I, real_field = False)
             self.biquaternions.loc[i, 'h_tra_up'] = Quaternion(h_tra_up[0], h_tra_up[1]*I, h_tra_up[2]*I, h_tra_up[3]*I, real_field = False)
 

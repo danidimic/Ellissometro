@@ -51,7 +51,7 @@ theta = np.linspace(0, pi/2, nvalues)
 for i in range(nvalues):
 
 	inter.materials_to_mueller(theta[i])	#calcolo le matrici di Mueller
-	MMrif = inter.muellers.loc[0, 'M_rif']	#matrice di Mueller per la riflessione
+	MMrif = inter.muellers.loc[0, 'M_rif_dw']	#matrice di Mueller per la riflessione
 	#print("matrice di Mueller: ", MMrif)
 	#print()
 
@@ -72,7 +72,7 @@ for i in range(nvalues):
 	#Calcolo con formalismo quaternioni
 	riniz.generic_polarization(1, 1)	#vettore di Stokes incidente, polarizzazione lineare  
 	s = Quaternion( riniz.I(), riniz.Q()*I, riniz.U()*I, riniz.V()*I )	#quaternione corrispondente al vett Stoke
-	hrif = inter.biquaternions.loc[0, 'h_rif']*np.sqrt(MMrif[0,0])				#quaternione corrispondente alla matrice di Mueller	
+	hrif = inter.biquaternions.loc[0, 'h_rif_dw']*np.sqrt(MMrif[0,0])				#quaternione corrispondente alla matrice di Mueller	
 	
 	psi, delta, rfin = grandell([hrif], s, svfinal=True)
 
