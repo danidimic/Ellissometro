@@ -8,21 +8,7 @@ from sympy.algebras.quaternion import Quaternion
 from stokes import stokes_vector
 from sorgente import sorgente
 from campione import campione
-from interazione import interazione
-
-#prodotto scalare fra biquaterioni, per ora inutile
-def scalar_prod(q1, q2):
-	return q1.a*q2.a + q1.b*q2.b + q1.c*q2.c + q1.d*q2.d
-
-
-#coniugato di un quaternione
-def conjugate(h):
-	tau   =  np.conj( h.a )
-	alfa  =  np.conj(-h.b*I)
-	beta  =  np.conj(-h.c*I)
-	gamma =  np.conj(-h.d*I)
-	
-	return Quaternion( tau, alfa*I, beta*I, gamma*I )
+from interazione import *
 
 
 #indici rifrzione
@@ -86,17 +72,9 @@ for i in range(nvalues):
 	#Calcolo con formalismo quaternioni
 	riniz.generic_polarization(1, 1)	#vettore di Stokes incidente, polarizzazione lineare  
 	s = Quaternion( riniz.I(), riniz.Q()*I, riniz.U()*I, riniz.V()*I )	#quaternione corrispondente al vett Stoke
-	h = inter.biquaternions.loc[0, 'h_rif']*np.sqrt(MMrif[0,0])				#quaternione corrispondente alla matrice di Mueller	
+	hrif = inter.biquaternions.loc[0, 'h_rif']*np.sqrt(MMrif[0,0])				#quaternione corrispondente alla matrice di Mueller	
 	
-	hdaga = conjugate(h)
-	shdaga = s.mul(hdaga)
-	sfin	= h.mul(shdaga)
-	rfin = stokes_vector( complex(sfin.a), complex(sfin.b*(-1j)), complex(sfin.c*(-1j)), complex(sfin.d*(-1j)) )  #vettore di Stokes finale
-	#print(rfin)
-
-
-	hs = h.mul(s)			#prodotto hs tra quaternioni
-	shs = scalar_prod(h, hs)	#prodotto scalare s.hs
+	psi, delta, rfin = grandell([hrif], s, svfinal=True)
 
 	#Salva i risultati con quaternioni
 	Sq.append( rfin.I().real )
@@ -104,8 +82,10 @@ for i in range(nvalues):
 	Uq.append( rfin.U().real )
 	Vq.append( rfin.V().real )
 	#Parametri ellissometrici
-	Psiq.append( rfin.ellipsometric_Psi().real )
-	Deltaq.append( cmath.phase(shs).real )
+	#Psiq.append( rfin.ellipsometric_Psi().real )
+	#Deltaq.append( cmath.phase(shs).real )
+	Psiq.append( psi )
+	Deltaq.append( delta )
 
 
 #Grafico dei risultati con matrici di Mueller
@@ -115,7 +95,6 @@ plt.plot(theta, S , label='I')
 plt.plot(theta, Q , label='Q')
 plt.plot(theta, U , label='U')
 plt.plot(theta, V , label='V')
-#plt.plot(theta, Psi, label='$\Psi$', lw=2.5)
 plt.grid(True)
 plt.legend()
 plt.show()
@@ -138,23 +117,9 @@ Deltaq = np.dot(Deltaq, 180/pi)
 #con i quaternioni
 plt.title("Calcolo tramite quaternioni")
 plt.xlabel("Angolo incidente [rad]")
-plt.plot(theta, Psiq, label='$\Psi$ quaternioni', lw=2.5)
-plt.plot(theta, Psiq, label='$\Psi$ Mueller', linestyle='dashed')
+plt.plot(theta, Psi, label='$\Psi$ Mueller', lw=2.5)
+plt.plot(theta, Psiq, label='$\Psi$ quaternioni', linestyle='dashed')
 plt.plot(theta, Deltaq, label='$\Delta$ quaternioni')
-#plt.plot(theta, Delta, label='$\Delta$ Mueller')
-plt.grid(True)
-plt.legend()
-plt.show()
-
-#con i quaternioni
-plt.title("Confronto fra U")
-plt.xlabel("Angolo incidente [rad]")
-plt.plot(theta, Sq, label='$S$ quaternioni', lw=2.5)
-plt.plot(theta, S, label='$S$ Mueller', linestyle='dashed')
-plt.plot(theta, Uq, label='$U$ quaternioni')
-plt.plot(theta, U, label='$U$ Mueller')
-plt.plot(theta, Qq, label='$Q$ quaternioni')
-plt.plot(theta, Q, label='$Q$ Mueller')
 #plt.plot(theta, Delta, label='$\Delta$ Mueller')
 plt.grid(True)
 plt.legend()

@@ -2,14 +2,15 @@ import matplotlib.pyplot as plt
 import math
 import cmath
 import numpy as np
+import pandas as pd
 from mueller import MM
 from stokes import stokes_vector
-import pandas as pd
 from sorgente import sorgente
 from campione import campione
 from matrix import *
-from sympy.algebras.quaternion import Quaternion
 from sympy import I
+from sympy.algebras.quaternion import Quaternion
+
 
 c=299792458; #(m/s);
 h=4.13566743e-15; #(eV s)
@@ -109,10 +110,69 @@ class interazione:
             self.biquaternions.loc[i, 'h_tra_dw'] = Quaternion(h_tra_dw[0], h_tra_dw[1]*I, h_tra_dw[2]*I, h_tra_dw[3]*I, real_field = False)
             self.biquaternions.loc[i, 'h_tra_up'] = Quaternion(h_tra_up[0], h_tra_up[1]*I, h_tra_up[2]*I, h_tra_up[3]*I, real_field = False)
 
-            
+
+#Normalizzazione della matrice di Mueller       
 def normalize(Mueller_mat):
         M_00 = Mueller_mat[0,0]
         normalized = Mueller_mat*(1./M_00)
         return normalized
-        #return Mueller_mat
-    
+
+
+#Prodotto scalare fra biquaterioni
+def scalar_prod(q1, q2):
+	return q1.a*q2.a + q1.b*q2.b + q1.c*q2.c + q1.d*q2.d
+
+
+#Coniugato di un quaternione
+def conjugate(h):
+
+	tau   =  np.conj( h.a )
+	alfa  =  np.conj(-h.b*I)
+	beta  =  np.conj(-h.c*I)
+	gamma =  np.conj(-h.d*I)
+	
+	return Quaternion( tau, alfa*I, beta*I, gamma*I )
+
+     
+#Moltiplicazione di quaternioni per ottenere h, hdaga
+def multiplication(arr):
+	h = arr[0]
+	
+	if len(arr)==1:
+		return [ h, conjugate(h) ]
+
+	else:
+		for i in range(1, len(arr)):
+			h.mul(arr[i])
+		return [ h, conjugate(h) ]
+
+
+#Calcolo le grandezze ellissometriche Psi, delta
+#a partire dai quaternioni arr di un singolo raggio 
+def grandell(arr, s, svfinal=False, quatfinal=False):
+
+	h, hdaga = multiplication(arr)
+
+	shdaga = s.mul(hdaga)
+	sfin	= h.mul(shdaga)
+	rfin = stokes_vector( complex(sfin.a), complex(sfin.b*(-1j)), complex(sfin.c*(-1j)), complex(sfin.d*(-1j)) )  #vettore di Stokes finale
+	
+	hs = h.mul(s)			#prodotto hs tra quaternioni
+	shs = scalar_prod(h, hs)	#prodotto scalare s.hs
+
+	psi = rfin.ellipsometric_Psi().real
+	delta = cmath.phase(shs).real
+
+	if svfinal == False and quatfinal == False:
+		return [psi, delta]
+
+	elif svfinal == True and quatfinal == False:
+		return [psi, delta, rfin]
+
+	elif svfinal == False and quatfinal == True:
+		return [psi, delta, sfin]
+
+	else:
+		return [psi, delta, rfin, sfin]
+
+
