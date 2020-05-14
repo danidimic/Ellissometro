@@ -82,6 +82,7 @@ class interazione:
            
         for i in range(self.campione.strati+1):
             
+            #print('elemento 00: ',self.muellers.loc[i, 'M_rif'][0,0])
             #normalizzo le matrici di Mueller
             M_mat_nr = normalize(self.muellers.loc[i, 'M_mat'])
             M_rif_nr = normalize(self.muellers.loc[i, 'M_rif'])
@@ -113,4 +114,5 @@ def normalize(Mueller_mat):
         M_00 = Mueller_mat[0,0]
         normalized = Mueller_mat*(1./M_00)
         return normalized
+        #return Mueller_mat
     

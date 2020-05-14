@@ -86,24 +86,26 @@ for i in range(nvalues):
 	#Calcolo con formalismo quaternioni
 	riniz.generic_polarization(1, 1)	#vettore di Stokes incidente, polarizzazione lineare  
 	s = Quaternion( riniz.I(), riniz.Q()*I, riniz.U()*I, riniz.V()*I )	#quaternione corrispondente al vett Stoke
-	h = inter.biquaternions.loc[0, 'h_rif']				#quaternione corrispondente alla matrice di Mueller	
+	h = inter.biquaternions.loc[0, 'h_rif']*np.sqrt(MMrif[0,0])				#quaternione corrispondente alla matrice di Mueller	
 	
 	hdaga = conjugate(h)
 	shdaga = s.mul(hdaga)
 	sfin	= h.mul(shdaga)
 	rfin = stokes_vector( complex(sfin.a), complex(sfin.b*(-1j)), complex(sfin.c*(-1j)), complex(sfin.d*(-1j)) )  #vettore di Stokes finale
+	#print(rfin)
+
 
 	hs = h.mul(s)			#prodotto hs tra quaternioni
-	shs = scalar_prod(h, hs)*MMrif[0,0]	#prodotto scalare s.hs
+	shs = scalar_prod(h, hs)	#prodotto scalare s.hs
 
 	#Salva i risultati con quaternioni
-	Sq.append( rfin.I() )
-	Qq.append( rfin.Q() )
-	Uq.append( rfin.U() )
-	Vq.append( rfin.V() )
+	Sq.append( rfin.I().real )
+	Qq.append( rfin.Q().real )
+	Uq.append( rfin.U().real )
+	Vq.append( rfin.V().real )
 	#Parametri ellissometrici
-	Psiq.append( rfin.ellipsometric_Psi() )
-	Deltaq.append( cmath.phase(shs) )
+	Psiq.append( rfin.ellipsometric_Psi().real )
+	Deltaq.append( cmath.phase(shs).real )
 
 
 #Grafico dei risultati con matrici di Mueller
@@ -144,6 +146,19 @@ plt.grid(True)
 plt.legend()
 plt.show()
 
+#con i quaternioni
+plt.title("Confronto fra U")
+plt.xlabel("Angolo incidente [rad]")
+plt.plot(theta, Sq, label='$S$ quaternioni', lw=2.5)
+plt.plot(theta, S, label='$S$ Mueller', linestyle='dashed')
+plt.plot(theta, Uq, label='$U$ quaternioni')
+plt.plot(theta, U, label='$U$ Mueller')
+plt.plot(theta, Qq, label='$Q$ quaternioni')
+plt.plot(theta, Q, label='$Q$ Mueller')
+#plt.plot(theta, Delta, label='$\Delta$ Mueller')
+plt.grid(True)
+plt.legend()
+plt.show()
 
 
 

@@ -35,13 +35,17 @@ def covariance_vector(H):
 
 	h = np.zeros(4, dtype=np.complex64)
 	rank = np.linalg.matrix_rank(H)
+	#print(rank)
 
     #Se la matrice è di rango=1 c'è un solo autovalore non nullo
 	if rank==1 :
 		eigvals, eigvecs = la.eig(H)
-
+		#print(eigvals)
+        
+		indexeig = 0
 		for i in range(4):
-			if abs(eigvals[i]) > 1e-5 :
+			if abs(eigvals[i]) > abs(eigvals[indexeig]):
+				
 				indexeig = i
 
         #l'autovettore è scritto come vettore colonna
@@ -50,8 +54,8 @@ def covariance_vector(H):
 		h[2] = eigvecs[2][indexeig]
 		h[3] = eigvecs[3][indexeig]
             
-		norm = la.norm(h) #inutile? (la.eig li restituisce già normalizzati)
-		h /= np.sqrt(norm)
+		#norm = la.norm(h) #inutile? (la.eig li restituisce già normalizzati)
+		h = eigvals[indexeig]*h #np.sqrt(norm)
             
 	return h
 
