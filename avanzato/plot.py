@@ -52,8 +52,6 @@ for i in range(nvalues):
 
 	inter.materials_to_mueller(theta[i])	#calcolo le matrici di Mueller
 	MMrif = inter.muellers.loc[0, 'M_rif_dw']	#matrice di Mueller per la riflessione
-	#print("matrice di Mueller: ", MMrif)
-	#print()
 
 	#Vettori di Stokes con matrici di Mueller
 	riniz.generic_polarization(1, 1)	#vettore di Stokes incidente, polarizzazione lineare
@@ -72,7 +70,7 @@ for i in range(nvalues):
 	#Calcolo con formalismo quaternioni
 	riniz.generic_polarization(1, 1)	#vettore di Stokes incidente, polarizzazione lineare  
 	s = Quaternion( riniz.I(), riniz.Q()*I, riniz.U()*I, riniz.V()*I )	#quaternione corrispondente al vett Stoke
-	hrif = inter.biquaternions.loc[0, 'h_rif_dw']*np.sqrt(MMrif[0,0])				#quaternione corrispondente alla matrice di Mueller	
+	hrif = inter.biquaternions.loc[0, 'h_rif_dw']								#quaternione corrispondente alla matrice di Mueller	
 	
 	psi, delta, rfin = grandell([hrif], s, svfinal=True)
 
@@ -82,8 +80,6 @@ for i in range(nvalues):
 	Uq.append( rfin.U().real )
 	Vq.append( rfin.V().real )
 	#Parametri ellissometrici
-	#Psiq.append( rfin.ellipsometric_Psi().real )
-	#Deltaq.append( cmath.phase(shs).real )
 	Psiq.append( psi )
 	Deltaq.append( delta )
 

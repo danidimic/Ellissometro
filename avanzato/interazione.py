@@ -109,11 +109,17 @@ class interazione:
             #print(H_rif) #NOTA: h_mat è autovettore di una matrice multipla dell'identità
             #print()
             
-            self.biquaternions.loc[i, 'h_mat'] = Quaternion(h_mat[0], h_mat[1]*I, h_mat[2]*I, h_mat[3]*I, real_field = False)
+            self.biquaternions.loc[i, 'h_mat']    = Quaternion(h_mat[0], h_mat[1]*I, h_mat[2]*I, h_mat[3]*I, real_field = False)
             self.biquaternions.loc[i, 'h_rif_dw'] = Quaternion(h_rif_dw[0], h_rif_dw[1]*I, h_rif_dw[2]*I, h_rif_dw[3]*I, real_field = False)
             self.biquaternions.loc[i, 'h_rif_up'] = Quaternion(h_rif_up[0], h_rif_up[1]*I, h_rif_up[2]*I, h_rif_up[3]*I, real_field = False)
             self.biquaternions.loc[i, 'h_tra_dw'] = Quaternion(h_tra_dw[0], h_tra_dw[1]*I, h_tra_dw[2]*I, h_tra_dw[3]*I, real_field = False)
             self.biquaternions.loc[i, 'h_tra_up'] = Quaternion(h_tra_up[0], h_tra_up[1]*I, h_tra_up[2]*I, h_tra_up[3]*I, real_field = False)
+            #Normalizzo subito tutti i quaternioni per non doverlo fare dopo
+            self.biquaternions.loc[i, 'h_mat']    *= np.sqrt( self.muellers.loc[i, 'M_mat'][0,0] )
+            self.biquaternions.loc[i, 'h_rif_dw'] *= np.sqrt( self.muellers.loc[i, 'M_rif_dw'][0,0] )
+            self.biquaternions.loc[i, 'h_rif_up'] *= np.sqrt( self.muellers.loc[i, 'M_rif_up'][0,0] )
+            self.biquaternions.loc[i, 'h_tra_dw'] *= np.sqrt( self.muellers.loc[i, 'M_tra_dw'][0,0] )
+            self.biquaternions.loc[i, 'h_tra_up'] *= np.sqrt( self.muellers.loc[i, 'M_tra_up'][0,0] )
 
 
 #Normalizzazione della matrice di Mueller       

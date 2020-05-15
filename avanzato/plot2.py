@@ -34,7 +34,6 @@ V = []
 Psi = []
 Delta = []
 
-
 nvalues = 100
 theta = np.linspace(0, pi/2, nvalues)
 
@@ -45,32 +44,25 @@ for i in range(nvalues):
 	#Matrice Mueller interfaccia 1
 	MMrif1dw = inter.muellers.loc[0, 'M_rif_dw']
 	MMrif1up = inter.muellers.loc[0, 'M_rif_up']
-	MMtra1up   = inter.muellers.loc[0, 'M_tra_up']
-	MMtra1dw   = inter.muellers.loc[0, 'M_tra_dw']
+	MMtra1up = inter.muellers.loc[0, 'M_tra_up']
+	MMtra1dw = inter.muellers.loc[0, 'M_tra_dw']
 	#Matrici Mueller interfaccia 2
-	MMmat  = inter.muellers.loc[1, 'M_mat']
 	MMrif2dw = inter.muellers.loc[1, 'M_rif_dw']
 	MMrif2up = inter.muellers.loc[1, 'M_rif_up']
+	#Matrice Mueller strato
+	MMmat  = inter.muellers.loc[1, 'M_mat']
 
 	#Quaternioni interfaccia 1
-	hrif1dw = inter.muellers.loc[0, 'h_rif_dw']
-	hrif1up = inter.muellers.loc[0, 'h_rif_up']
-	htra1up   = inter.muellers.loc[0, 'h_tra_up']
-	htra1dw   = inter.muellers.loc[0, 'h_tra_dw']
+	hrif1dw = inter.biquaternions.loc[0, 'h_rif_dw']
+	hrif1up = inter.biquaternions.loc[0, 'h_rif_up']
+	htra1up = inter.biquaternions.loc[0, 'h_tra_up']
+	htra1dw = inter.biquaternions.loc[0, 'h_tra_dw']
 	#Quaternioni interfaccia 2
-	hmat  = inter.muellers.loc[1, 'h_mat']
-	hrif2dw = inter.muellers.loc[1, 'h_rif_dw']
-	hrif2up = inter.muellers.loc[1, 'h_rif_up']
+	hrif2dw = inter.biquaternions.loc[1, 'h_rif_dw']
+	hrif2up = inter.biquaternions.loc[1, 'h_rif_up']
+	#Quaternione strato
+	hmat  = inter.biquaternions.loc[1, 'h_mat']
 	
-	'''
-	h1rifdw = inter.biquaternions.loc[0, 'h_rif_dw']*np.sqrt(MMrif1[0,0])				#quaternione corrispondente alla matrice di Mueller	
-
-	h2dw  = inter.biquaternions.loc[0, 'h_tra_dw']*np.sqrt(MMdw[0,0])				#quaternione corrispondente alla matrice di Mueller	
-	h2mat = inter.biquaternions.loc[1, 'h_mat']*np.sqrt(MMmat[0,0])					#quaternione corrispondente alla matrice di Mueller	
-	h2rif = inter.biquaternions.loc[1, 'h_rif']*np.sqrt(MMrif2[0,0])					#quaternione corrispondente alla matrice di Mueller	
-	h2up  = inter.biquaternions.loc[0, 'h_tra_up']*np.sqrt(MMup[0,0])				#quaternione corrispondente alla matrice di Mueller	
-	'''
-
 	#Raggio 1
 	r.generic_polarization(1, 1)	#vettore di Stokes incidente1, polarizzazione lineare 
 	s = Quaternion( r.I(), r.Q()*I, r.U()*I, r.V()*I )	#quaternione corrispondente al vett Stoke
@@ -82,8 +74,6 @@ for i in range(nvalues):
 
 	htot = h1 + h2 + h3
 
-	#psi, delta, rfin = grandell([h1rif], s, svfinal=True)
-	#psi, delta, rfin = grandell([h2up, h2mat, h2rif, h2mat, h2dw], s, svfinal=True)
 	psi, delta, rfin = grandell([htot], s, svfinal=True)
 
 	S.append( rfin.I().real )
