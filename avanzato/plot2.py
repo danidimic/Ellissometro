@@ -27,6 +27,13 @@ sorg = sorgente(1.95954488, 1, 0.78539163) #per ora non uso i due argomenti a dx
 r = stokes_vector()			#inizializzo oggetto vettore di stokes
 inter = interazione(0.0001, camp, sorg)  #inizializzo oggetto interazione
 
+Smm = []
+Qmm = []
+Umm = []
+Vmm = []
+Psimm = []
+Deltamm = []
+
 S = []
 Q = []
 U = []
@@ -38,7 +45,9 @@ nvalues = 100
 theta = np.linspace(0, pi/2, nvalues)
 
 for i in range(nvalues):
-	print("iterazione: ", i+1)
+	print("Calcolo grandezze ellissometriche e vettori Stokes")
+	print("Angolo incidente ", theta[i]*180/pi, "°")
+	print()
 	inter.materials_to_mueller(theta[i])	#calcolo le matrici di Mueller
 
 	#Matrice Mueller interfaccia 1
@@ -62,18 +71,36 @@ for i in range(nvalues):
 	hrif2up = inter.biquaternions.loc[1, 'h_rif_up']
 	#Quaternione strato
 	hmat  = inter.biquaternions.loc[1, 'h_mat']
-	
-	#Raggio 1
+
+	'''
+	###############################
+	#Calcolo con formalismo Mueller
+	r.generic_polarization(1, 1)
+	r.mueller_product(MMtra1dw)
+	r.mueller_product(MMmat)
+	r.mueller_product(MMrif2dw)
+	r.mueller_product(MMmat)
+	r.mueller_product(MMtra1up)
+
+	Smm.append( r.I().real )
+	Qmm.append( r.Q().real )
+	Umm.append( r.U().real )
+	Vmm.append( r.V().real )
+	Psimm.append( r.ellipsometric_Psi() )
+	Deltamm.append( r.ellipsometric_Delta() )
+	'''
+
+
+	#######################################
+	#Calcolo col formalismo dei quaternioni	
 	r.generic_polarization(1, 1)	#vettore di Stokes incidente1, polarizzazione lineare 
 	s = Quaternion( r.I(), r.Q()*I, r.U()*I, r.V()*I )	#quaternione corrispondente al vett Stoke
 
 	#quaternioni finali corrispondenti ai raggi
 	h1, h1daga = multiplication([hrif1dw])
 	h2, h2daga = multiplication([htra1up, hmat, hrif2dw, hmat, htra1dw])
-	h3, h3daga = multiplication([htra1up, hmat, hrif2dw, hmat, hrif1up, hmat, hrif2dw, hmat, htra1dw])
 
-	htot = h1 + h2 + h3
-
+	htot = h1 + h2
 	psi, delta, rfin = grandell([htot], s, svfinal=True)
 
 	S.append( rfin.I().real )
@@ -87,6 +114,30 @@ for i in range(nvalues):
 Psi = np.dot(Psi, 180/pi)
 Delta = np.dot(Delta, 180/pi)
 
+#Psimm = np.dot(Psimm, 180/pi)
+#Deltamm = np.dot(Deltamm, 180/pi)
+
+'''
+plt.title("Calcolo tramite Mueller")
+plt.xlabel("Angolo incidente [rad]")
+plt.plot(theta, Smm , label='I')
+plt.plot(theta, Qmm , label='Q')
+plt.plot(theta, Umm , label='U')
+plt.plot(theta, Vmm , label='V')
+plt.grid(True)
+plt.legend()
+plt.show()
+
+plt.title("Calcolo tramite Mueller")
+plt.xlabel("Angolo incidente [rad]")
+plt.plot(theta, Psimm, label='$\Psi$ quaternioni', lw=2.5)
+plt.plot(theta, Deltamm, label='$\Delta$ quaternioni')
+plt.grid(True)
+plt.legend()
+plt.show()
+'''
+
+
 plt.title("Calcolo tramite quaternioni")
 plt.xlabel("Angolo incidente [rad]")
 plt.plot(theta, S , label='I')
@@ -99,7 +150,7 @@ plt.show()
 
 plt.title("Calcolo tramite quaternioni")
 plt.xlabel("Angolo incidente [rad]")
-plt.plot(theta, Psi, label='$\Psi$ quaternioni', lw=2.5)
+plt.plot(theta, Psi, label='$\Psi$ quaternioni')
 plt.plot(theta, Delta, label='$\Delta$ quaternioni')
 plt.grid(True)
 plt.legend()

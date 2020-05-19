@@ -147,14 +147,19 @@ def conjugate(h):
      
 #Moltiplicazione di quaternioni per ottenere h, hdaga
 def multiplication(arr):
-	h = arr[0]
 	
-	if len(arr)==1:
+	l = len(arr)
+
+	if l==1:
+		h = arr[0]
 		return [ h, conjugate(h) ]
 
 	else:
-		for i in range(1, len(arr)):
-			h.mul(arr[i])
+		h = arr[l-2].mul(arr[l-1])
+		for i in range(0, l-2):
+			index = l-3-i
+			h = arr[index].mul(h)
+
 		return [ h, conjugate(h) ]
 
 
