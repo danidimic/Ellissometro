@@ -35,13 +35,18 @@ class interazione:
         self.biquaternions = self.biquaternions.astype(object)
         
         #lista con i quaternioni che dovrò usare per calcolare la differenze di fase prima di
-        #effettuare la combinazione lineare dei cammini (è GIUSTA L'IDEA?)
-        self.s_fin = []
+        #effettuare la combinazione lineare dei cammini (è GIUSTA L'IDEA?) e dei quaternioni 
+        #dei rispettivi cammini
+        righe = []
+        col = ['s_fin', 'h_fin']
+        self.s_h_fin = pd.DataFrame(0, righe, col)
+        self.s_h_fin = self.s_quaternions.astype(object)        
+
         
         #inizializzo il vettore con i quaternioni dei raggi durante la propagazione,
         #al SOLO RAGGIO INIZIALE (DA FARE)
         righe = []
-        col = ['s', 'provenienza', 'arrivo']
+        col = ['s', 'provenienza', 'arrivo', 'h_parziale']
         self.s_quaternions = pd.DataFrame(0, righe, col)
         self.s_quaternions = self.s_quaternions.astype(object)
         
@@ -151,62 +156,141 @@ class interazione:
             s_ = self.s_quaternions.loc[k, 's']
             ii_ = self.s_quaternions.loc[k, 'provenienza']
             jj_ = self.s_quaternions.loc[k, 'arrivo']
+            h_part = self.s_quaternions.loc[k, 'h_partial'] #quaternione relativo alla propagazione precedente
             
             #elimino raggi troppo flebili
             #lo faccio attraverso l'intensità totale (DA CONTROLLARE, DIVERSO DAL PROGRAMMA VECCHIO)
             
             if abs(s_.a) > self.precisione:
+                
+                #tratto a parte il caso di raggi vicini alla superficie
                 if ii_ == 0 and jj_ == 1:
                     
-                    #viene riflesso, e il primo cammino finisce qui!
+                    #####################viene riflesso, e il primo cammino finisce qui!#################
                     #non considero effetti di propagazione nell'aria (si può aggiungere, con h_mat indice 0)
                     h = self.biquaternions.loc[0, 'h_rif_dw']
-                    hdaga = conjugate(self.biquaternions.loc[0, 'h_rif_dw'])
+                    hdaga = conjugate(h)
                     shdaga = s_.mul(hdaga)
                     sfin	= h.mul(shdaga)
                     
-                    self.s_fin.append(sfin)
+                    self.s_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
+                    #####################################################################################
                     
-                    #viene trasmesso e produce un nuovo cammino
+                    #######################viene trasmesso e produce un nuovo cammino####################
                     #trasmissione
                     h_tra = self.biquaternions.loc[0, 'h_tra_dw']
                     
                     #propagazione nel mezzo
                     h_mat = self.biquaternions.loc[1, 'h_mat']
                     
-                    h, hdaga = multiplication([h_tra, h_mat])
-                    
+                    h, hdaga = multiplication([h_tra, h_mat])                    
                     shdaga = s_.mul(hdaga)
                     sfin = h.mul(shdaga)
                     
                     #questo lo aggiungo al DF dei raggi
-                    self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2}, ignore_index=True)
+                    self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2, "h_partial": h}, ignore_index=True)
+                    #####################################################################################
                     
-                if ii_ == 0 and jj_ == 1:
+                elif ii_ == 1 and jj_ == 0:
                     
-                    #viene trasmesso, e il cammino finisce qui!
+                    ######################viene trasmesso, e il cammino finisce qui!#####################
                     #non considero effetti di propagazione nell'aria (si può aggiungere, con h_mat indice 0)
-                    h = self.biquaternions.loc[0, 'h_tra_up']
-                    hdaga = conjugate(self.biquaternions.loc[0, 'h_tra_up'])
+                    
+                    h = h_part.mul(self.biquaternions.loc[0, 'h_tra_up']) #aggiungo l'ultimo pezzo di trasmissione
+                    
+                    hdaga = conjugate(h)
                     shdaga = s_.mul(hdaga)
                     sfin	= h.mul(shdaga)
                     
-                    self.s_fin.append(sfin)
+                    self.s_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
+                    #####################################################################################                    
                     
-                    #viene trasmesso e produce un nuovo cammino
+                    ###################viene riflesso in basso e produce un nuovo cammino################
                     #riflessione
-                    h_tra = self.biquaternions.loc[0, 'h_rif_up']
+                    h_rif = self.biquaternions.loc[0, 'h_rif_up']
                     
                     #propagazione nel mezzo
                     h_mat = self.biquaternions.loc[1, 'h_mat']
                     
-                    h, hdaga = multiplication([h_tra, h_mat])
-                    
+                    h, hdaga = multiplication([h_part, h_rif, h_mat])      
                     shdaga = s_.mul(hdaga)
                     sfin = h.mul(shdaga)
                     
                     #questo lo aggiungo al DF dei raggi
-                    self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2}, ignore_index=True)
+                    self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2, "h_partial": h}, ignore_index=True)
+                    #####################################################################################                    
+                    
+                else:
+                    
+                    #raggi che propagano verso il basso
+                    if ii_ < jj_:
+                            
+                        #############################produce un raggio trasmesso#############################
+                        #trasmissione
+                        h_tra = self.biquaternions.loc[ii_, 'h_tra_dw']
+                    
+                        #propagazione nel mezzo jj_
+                        h_mat = self.biquaternions.loc[jj_, 'h_mat']
+                        
+                        h, hdaga = multiplication([h_part, h_tra, h_mat])      
+                        shdaga = s_.mul(hdaga)
+                        sfin = h.mul(shdaga)
+                        
+                        #lo aggiungo al DF dei raggi
+                        self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ + 1, "arrivo": jj_ + 1, "h_partial": h}, ignore_index=True)
+                        
+                        #####################################################################################                    
+
+                        #############################produce un raggio riflesso##############################
+                        #riflessione
+                        h_rif = self.biquaternions.loc[ii_, 'h_rif_dw']
+                    
+                        #propagazione nel mezzo ii_
+                        h_mat = self.biquaternions.loc[ii_, 'h_mat']
+                        
+                        h, hdaga = multiplication([h_part, h_tra, h_mat])      
+                        shdaga = s_.mul(hdaga)
+                        sfin = h.mul(shdaga)
+                        
+                        #lo aggiungo al DF dei raggi
+                        self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_, "arrivo": jj_ - 2, "h_partial": h}, ignore_index=True)
+
+                        #####################################################################################
+                        
+                    #raggi che propagano verso l'alto
+                    elif ii_ > jj_:
+                        
+                        #############################produce un raggio trasmesso#############################
+                        #trasmissione
+                        h_tra = self.biquaternions.loc[jj_, 'h_tra_up']
+                    
+                        #propagazione nel mezzo jj_
+                        h_mat = self.biquaternions.loc[jj_, 'h_mat']
+                        
+                        h, hdaga = multiplication([h_part, h_tra, h_mat])      
+                        shdaga = s_.mul(hdaga)
+                        sfin = h.mul(shdaga)
+                        
+                        #lo aggiungo al DF dei raggi
+                        self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ - 1, "arrivo": jj_ - 1, "h_partial": h}, ignore_index=True)
+                        
+                        #####################################################################################                    
+
+                        #############################produce un raggio riflesso##############################
+                        #riflessione
+                        h_rif = self.biquaternions.loc[jj_, 'h_rif_up']
+                    
+                        #propagazione nel mezzo ii_
+                        h_mat = self.biquaternions.loc[ii_, 'h_mat']
+                        
+                        h, hdaga = multiplication([h_part, h_tra, h_mat])      
+                        shdaga = s_.mul(hdaga)
+                        sfin = h.mul(shdaga)
+                        
+                        #lo aggiungo al DF dei raggi
+                        self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_, "arrivo": jj_ + 2, "h_partial": h}, ignore_index=True)
+
+                        #####################################################################################
 
 #Normalizzazione della matrice di Mueller       
 def normalize(Mueller_mat):
