@@ -34,6 +34,26 @@ class interazione:
         self.biquaternions = pd.DataFrame(0, righe, col)
         self.biquaternions = self.biquaternions.astype(object)
         
+        #lista con i quaternioni che dovrò usare per calcolare la differenze di fase prima di
+        #effettuare la combinazione lineare dei cammini (è GIUSTA L'IDEA?)
+        self.s_fin = []
+        
+        #inizializzo il vettore con i quaternioni dei raggi durante la propagazione,
+        #al SOLO RAGGIO INIZIALE (DA FARE)
+        righe = []
+        col = ['s', 'provenienza', 'arrivo']
+        self.s_quaternions = pd.DataFrame(0, righe, col)
+        self.s_quaternions = self.s_quaternions.astype(object)
+        
+        #inizializzo PER ORA qui con quaternioni e direzioni di propagazione di prova
+
+        ii = [1, 1]
+        jj = [0, 2]
+
+        s_input = [Quaternion(1, 2*I, 3*I, 4*I), Quaternion(5, 6*I, 7*I, 8*I)]
+        
+        for i in range(np.size(ii)):
+            self.s_quaternions = self.s_quaternions.append({'s': s_input[i], "provenienza": ii[i], "arrivo": jj[i]}, ignore_index=True)
         
     def materials_to_mueller(self, theta0):
         
@@ -121,6 +141,72 @@ class interazione:
             self.biquaternions.loc[i, 'h_tra_dw'] *= np.sqrt( self.muellers.loc[i, 'M_tra_dw'][0,0] )
             self.biquaternions.loc[i, 'h_tra_up'] *= np.sqrt( self.muellers.loc[i, 'M_tra_up'][0,0] )
 
+    def propagazione():
+    
+        nraggi = self.s_quaternions.shape[0]
+
+        for k in range(nraggi):        
+            
+            #raggio che considero
+            s_ = self.s_quaternions.loc[k, 's']
+            ii_ = self.s_quaternions.loc[k, 'provenienza']
+            jj_ = self.s_quaternions.loc[k, 'arrivo']
+            
+            #elimino raggi troppo flebili
+            #lo faccio attraverso l'intensità totale (DA CONTROLLARE, DIVERSO DAL PROGRAMMA VECCHIO)
+            
+            if abs(s_.a) > self.precisione:
+                if ii_ == 0 and jj_ == 1:
+                    
+                    #viene riflesso, e il primo cammino finisce qui!
+                    #non considero effetti di propagazione nell'aria (si può aggiungere, con h_mat indice 0)
+                    h = self.biquaternions.loc[0, 'h_rif_dw']
+                    hdaga = conjugate(self.biquaternions.loc[0, 'h_rif_dw'])
+                    shdaga = s_.mul(hdaga)
+                    sfin	= h.mul(shdaga)
+                    
+                    self.s_fin.append(sfin)
+                    
+                    #viene trasmesso e produce un nuovo cammino
+                    #trasmissione
+                    h_tra = self.biquaternions.loc[0, 'h_tra_dw']
+                    
+                    #propagazione nel mezzo
+                    h_mat = self.biquaternions.loc[1, 'h_mat']
+                    
+                    h, hdaga = multiplication([h_tra, h_mat])
+                    
+                    shdaga = s_.mul(hdaga)
+                    sfin = h.mul(shdaga)
+                    
+                    #questo lo aggiungo al DF dei raggi
+                    self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2}, ignore_index=True)
+                    
+                if ii_ == 0 and jj_ == 1:
+                    
+                    #viene trasmesso, e il cammino finisce qui!
+                    #non considero effetti di propagazione nell'aria (si può aggiungere, con h_mat indice 0)
+                    h = self.biquaternions.loc[0, 'h_tra_up']
+                    hdaga = conjugate(self.biquaternions.loc[0, 'h_tra_up'])
+                    shdaga = s_.mul(hdaga)
+                    sfin	= h.mul(shdaga)
+                    
+                    self.s_fin.append(sfin)
+                    
+                    #viene trasmesso e produce un nuovo cammino
+                    #riflessione
+                    h_tra = self.biquaternions.loc[0, 'h_rif_up']
+                    
+                    #propagazione nel mezzo
+                    h_mat = self.biquaternions.loc[1, 'h_mat']
+                    
+                    h, hdaga = multiplication([h_tra, h_mat])
+                    
+                    shdaga = s_.mul(hdaga)
+                    sfin = h.mul(shdaga)
+                    
+                    #questo lo aggiungo al DF dei raggi
+                    self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2}, ignore_index=True)
 
 #Normalizzazione della matrice di Mueller       
 def normalize(Mueller_mat):
