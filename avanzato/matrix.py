@@ -33,7 +33,7 @@ def covariance_matrix(mat):
 #Calcolo il vettore covariante data la matrice covarianza
 def covariance_vector(H):
 
-	h = np.zeros(4, dtype=np.complex64)
+	h = np.zeros(4, dtype=np.complex128)
 	rank = np.linalg.matrix_rank(H)
 	#print(rank)
 
