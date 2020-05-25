@@ -24,7 +24,7 @@ omega=2*math.pi*(sorg.energia)/h;
 wsuc=omega/c;
 lunghezza_donda = 2*math.pi*c/(nc0.real*omega)
 
-print(lunghezza_donda)
+#print('freq ang: ', wsuc)
  
 r = stokes_vector()			#inizializzo oggetto vettore di stokes
 
@@ -59,6 +59,10 @@ print('h2: ',tau2, alpha2, beta2, gamma2)
 h1q = Quaternion(tau1, alpha1*I, beta1*I, gamma1*I, real_field = False)
 h2q = Quaternion(tau2, alpha2*I, beta2*I, gamma2*I, real_field = False)
 
+print()
+print('h1q: ', h1q)
+print('h1q: ', h2q)
+
 htot = h1q + h2q
     
 htot, htotdaga = multiplication([htot])
@@ -72,6 +76,7 @@ Q = rfin.Q().real
 U = rfin.U().real
 V = rfin.V().real 
 
+print()
 print("vettore di Stokes finale: ")
 print(S)
 print(Q)
