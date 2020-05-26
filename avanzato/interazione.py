@@ -87,7 +87,8 @@ class interazione:
             mueller_class = MM(n0, n1, theta_start, wsuc, spessore) #definisco la classe ad ogni passaggio, meglio cambiare?
             
             #assegno le matrici di Mueller al Data Frame:
-            self.muellers.loc[i, 'M_mat'] = np.array(mueller_class.mueller_layer())
+            phase_aquired, M = mueller_class.mueller_layer()
+            self.muellers.loc[i, 'M_mat'] = np.array(M)
             self.muellers.loc[i, 'M_rif_dw'] = np.array(mueller_class.mueller_reflection())
             self.muellers.loc[i, 'M_tra_dw'] = np.array(mueller_class.mueller_transmission())
             
@@ -125,7 +126,7 @@ class interazione:
             H_tra_up = covariance_matrix(M_tra_up_nr)
             
             #calcolo i vettori di covarianza
-            h_mat = covariance_vector(H_mat)
+            h_mat = covariance_vector(H_mat)*phase_aquired
             h_rif_dw = covariance_vector(H_rif_dw)
             h_rif_up = covariance_vector(H_rif_up)
             h_tra_dw = covariance_vector(H_tra_dw)

@@ -32,7 +32,7 @@ r = stokes_vector()			#inizializzo oggetto vettore di stokes
 #theta_vect = np.linspace(0, pi/2, nvalues)
 
 spessore1 = 0.00001
-spessore2 = 0.00001 + lunghezza_donda/2.
+spessore2 = 0.00001 + 0.97*lunghezza_donda/2.
 
 theta = 0   
     

@@ -75,8 +75,8 @@ M2_ = normalize(M2)
 H1 = covariance_matrix(M1_)
 H2 = covariance_matrix(M2_)
 
-h1 = covariance_vector(H1)*np.exp(-1j*phase1)
-h2 = covariance_vector(H2)*np.exp(-1j*phase2)
+h1 = covariance_vector(H1)*np.exp(-1j*phase1) #AGGIUNTO COEFFICIENTE COMPLESSO
+h2 = covariance_vector(H2)*np.exp(-1j*phase2) #PER TENERE TRACCIA DELLO SFASAMENTO
     
 h1q = Quaternion(h1[0], h1[1]*I, h1[2]*I, h1[3]*I, real_field = False)
 h2q = Quaternion(h2[0], h2[1]*I, h2[2]*I, h2[3]*I, real_field = False)
@@ -102,14 +102,14 @@ print('h2qf: ', h2qf)
 
 #quaternione finale del raggio attraverso il singolo materiale
 #h, hdaga = multiplication(arr) CONTROLLA NEL PROGRAMMA PRINCIPALE
-sh1qfdaga = s.mul(h1qfdaga)
-s1fin	= h1qf.mul(sh1qfdaga)
+#sh1qfdaga = s.mul(h1qfdaga)
+#s1fin	= h1qf.mul(sh1qfdaga)
 
 #print(h1qfdaga)
 #print(h1qf)
     
-sh2qfdaga = s.mul(h2qfdaga)
-s2fin	= h2qf.mul(sh1qfdaga)
+#sh2qfdaga = s.mul(h2qfdaga)
+#s2fin	= h2qf.mul(sh1qfdaga)
 
 '''   
 #MODIFICA IMPORTANTE
