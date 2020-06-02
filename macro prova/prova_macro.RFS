@@ -1,0 +1,33 @@
+###################################################
+############### 
+# 
+#   This macro instructs RefFIT to perform the actions described 
+#   in the RefFIT Manual (Tutorial section 3.2) 
+#   All input data are taken from the directory "..\PART2" 
+# 
+#   Written by A.Kuzmenko (2004) 
+# 
+###################################################
+############### 
+#------------------------------------------------------------------------------------ 
+# sets the dimensions and the title of the main (application) window  
+
+MainWindow(XPos = 0, YPos = 0, Width = 1024, Height = 740, Title = "macro example");
+NewModel(XPos = 0, YPos = 50, Width = 300, Height = 240);
+NewModel(XPos = 0, YPos = 295, Width = 300, Height = 240);
+LoadModel(ModelNo = 1, File = "provareffit.RFM");
+LoadModel(ModelNo = 2, File = "provareffitparameters.RFM");
+NewGraph(XPos = 300, YPos = 50, Width = 720, Height = 350); 
+GraphProperties(GraphNo = 1, Xmin = 75.0, Xmax = 1000.0, Xlog = 0, Ymin = 0.0, Ymax = 100.0, Ylog = 0, YTitle = "Reflectivity"); 
+AddModelCurve(GraphNo = 1, ModelNo = 1, Quantity = "E1");
+AddModelCurve(GraphNo = 1, ModelNo = 1, Quantity = "E2");
+
+BeginLoop(LoopFile = "LOOP.DAT");
+	SetModelParam(ModelNo = 1, ParamName = "Wp", LorNo = 1, Value = %1); 
+	GraphProperties(GraphNo = 1, Xmin = 75.0, Xmax = 1000.0, Xlog = 0, Ymin = 0.0, Ymax = 100.0, Ylog = 0, YTitle = "Reflectivity"); 
+	AddModelCurve(GraphNo = 1, ModelNo = 1, Quantity = "E1");
+	AddModelCurve(GraphNo = 1, ModelNo = 1, Quantity = "E2");
+	ExportModelCurve(File = "E1_theta%1.txt", ModelNo = 1, Quantity = "E1", XMin = 630.0, XMax = 632.0, XPts = 2);
+	ExportModelCurve(File = "E2_theta%1.txt", ModelNo = 1, Quantity = "E2", XMin = 630.0, XMax = 632.0, XPts = 2);
+	#Suspend();
+EndLoop();
