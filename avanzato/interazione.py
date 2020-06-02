@@ -34,6 +34,7 @@ class interazione:
         col = ['h_mat', 'h_rif_up', 'h_rif_dw', 'h_tra_dw', 'h_tra_up']
         self.biquaternions = pd.DataFrame(0, righe, col)
         self.biquaternions = self.biquaternions.astype(object)
+        print('nrighe: ', righe)
         
         
         #lista con i quaternioni che dovrò usare per calcolare la differenze di fase prima di
@@ -214,10 +215,13 @@ class interazione:
             jj_ = self.s_quaternions.loc[k, 'arrivo']
             h_part = self.s_quaternions.loc[k, 'h_partial'] #quaternione relativo alla propagazione precedente
             
+
             #elimino raggi troppo flebili
             #lo faccio attraverso l'intensità totale (DA CONTROLLARE, DIVERSO DAL PROGRAMMA VECCHIO)
+            #print('quaternion: ', s_)
             
-            if abs(s_.a) > self.precisione:
+            print('s_.a: ',complex(s_.a))
+            if abs(complex(s_.a)) > self.precisione: #CONTROLLA
                 
                 #tratto a parte il caso di raggi vicini alla superficie
                 if ii_ == 0 and jj_ == 1:
@@ -229,12 +233,13 @@ class interazione:
                     shdaga = s_.mul(hdaga)
                     sfin	= h.mul(shdaga)
                     
-                    self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
+                    self.s_h_fin = self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
                     #####################################################################################
                     
                     #######################viene trasmesso e produce un nuovo cammino####################
                     #trasmissione
                     h_tra = self.biquaternions.loc[0, 'h_tra_dw']
+                    #print(self.biquaternions)
                     
                     #propagazione nel mezzo
                     h_mat = self.biquaternions.loc[1, 'h_mat']
@@ -246,7 +251,7 @@ class interazione:
                     #questo lo aggiungo al DF dei raggi
                     self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2, "h_partial": h}, ignore_index=True)
                     #####################################################################################
-                    
+
                 elif ii_ == 1 and jj_ == 0:
                     
                     ######################viene trasmesso, e il cammino finisce qui!#####################
@@ -257,7 +262,8 @@ class interazione:
                     shdaga = s_.mul(hdaga)
                     sfin	= h.mul(shdaga)
                     
-                    self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
+                    self.s_h_fin = self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
+
                     #####################################################################################                    
                     
                     ###################viene riflesso in basso e produce un nuovo cammino################
@@ -274,27 +280,28 @@ class interazione:
                     #questo lo aggiungo al DF dei raggi
                     self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2, "h_partial": h}, ignore_index=True)
                     #####################################################################################                    
-                    
+
                 else:
                     
                     #raggi che propagano verso il basso
                     if ii_ < jj_:
+                        
+                        if jj_ < self.campione.strati+1:
+                            #############################produce un raggio trasmesso#############################
+                            #trasmissione
+                            h_tra = self.biquaternions.loc[ii_, 'h_tra_dw']
                             
-                        #############################produce un raggio trasmesso#############################
-                        #trasmissione
-                        h_tra = self.biquaternions.loc[ii_, 'h_tra_dw']
-                    
-                        #propagazione nel mezzo jj_
-                        h_mat = self.biquaternions.loc[jj_, 'h_mat']
+                            #propagazione nel mezzo jj_
+                            h_mat = self.biquaternions.loc[jj_, 'h_mat']
+                            
+                            h, hdaga = multiplication([h_mat, h_tra, h_part])      
+                            shdaga = s_.mul(hdaga)
+                            sfin = h.mul(shdaga)
                         
-                        h, hdaga = multiplication([h_mat, h_tra, h_part])      
-                        shdaga = s_.mul(hdaga)
-                        sfin = h.mul(shdaga)
+                            #lo aggiungo al DF dei raggi
+                            self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ + 1, "arrivo": jj_ + 1, "h_partial": h}, ignore_index=True)
                         
-                        #lo aggiungo al DF dei raggi
-                        self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ + 1, "arrivo": jj_ + 1, "h_partial": h}, ignore_index=True)
-                        
-                        #####################################################################################                    
+                            #####################################################################################                    
 
                         #############################produce un raggio riflesso##############################
                         #riflessione
@@ -347,15 +354,32 @@ class interazione:
 
                         #####################################################################################
                         
+                        
+        #elimino i raggi che ho usato nel ciclo precedente da s_quaternions, se no le riuso!
+        self.s_quaternions = self.s_quaternions.drop(range(self.nraggi))
+        self.s_quaternions = self.s_quaternions.reset_index(drop = True)
+            
         self.nraggi = self.s_quaternions.shape[0]
         
     def interference(self):
         
-        h = self.s_h_fin[:,'h'].to_numpy().tolist()
-        print(h)
+        #print()
+        #print('s h fin', self.s_h_fin)
+        #h = self.s_h_fin.to_numpy()#.tolist()
+        #h = h[:,1].tolist()
+        
+        h_ = []
+        
+        for i in self.s_h_fin.index:
+            if i != 0:
+                h_.append(self.s_h_fin['h_fin'][i])
+        
         htot = Quaternion(0, 0, 0, 0)
         
-        for i in h:
+        #print()
+        #print(h_)
+        
+        for i in h_:
             htot += i
         
         return htot

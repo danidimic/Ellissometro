@@ -12,15 +12,18 @@ from interazione import *
 
 
 #indici rifrzione
+#indici rifrzione
 n0 = 1
 n1 = 1.5+0.00000002j
-#n1 = 2.1+0.1j
+sp1 = 0.00002
+n2 = 1+0.00000005j
+pi = math.pi
 #Brewster angle
 br = np.arctan(n1/n0)
 pi = math.pi
 
 #definisco il campione
-camp = campione(n0, [n1])
+camp = campione(n0, [n1, sp1, n2])
 
 #definisco la sorgente
 sorg = sorgente(1.95954488, 1, 0.78539163) #per ora non uso i due argomenti a dx
@@ -50,13 +53,21 @@ for i in range(nvalues):
     #calcolo quaternioni del materiale e propago
 	inter.materials_to_jones(theta[i])
     
-	print('ciao1')
+    
+	n = 0
 	while inter.nraggi != 0:
+		print('iterazione: ', n)
 		inter.propagazione()
-	print('ciao2')
+		n += 1
 
 	h_fin = inter.interference()
     
+	print()
+	print(complex(h_fin.a))
+	print(complex(h_fin.b))
+	print(complex(h_fin.c))
+	print(complex(h_fin.d))
+ 
 	psi, delta, rfin = grandell([h_fin], s, svfinal=True)
 
 	#Salva i risultati con quaternioni
@@ -79,17 +90,14 @@ plt.grid(True)
 plt.legend()
 plt.show()
 
-Psi = np.dot(Psi, 180/pi)
 Psiq = np.dot(Psiq, 180/pi)
 Deltaq = np.dot(Deltaq, 180/pi)
 
 #con i quaternioni
 plt.title("Calcolo tramite quaternioni")
 plt.xlabel("Angolo incidente [rad]")
-plt.plot(theta, Psi, label='$\Psi$ Mueller', lw=2.5)
 plt.plot(theta, Psiq, label='$\Psi$ quaternioni', linestyle='dashed')
 plt.plot(theta, Deltaq, label='$\Delta$ quaternioni')
-plt.plot(theta, Delta, label='$\Delta$ Mueller')
 plt.grid(True)
 plt.legend()
 plt.show()
