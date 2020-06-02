@@ -25,7 +25,7 @@ camp = campione(n0, [n1, sp1, n2])
 sorg = sorgente(1.95954488, 1, 0.78539163) #per ora non uso i due argomenti a dx
 
 r = stokes_vector()			#inizializzo oggetto vettore di stokes
-inter = interazione(0.0001, camp, sorg)  #inizializzo oggetto interazione
+inter = interazione(0.0001, camp, sorg, r)  #inizializzo oggetto interazione
 
 Smm = []
 Qmm = []
@@ -45,6 +45,7 @@ nvalues = 50
 theta = np.linspace(0, pi/2, nvalues)
 
 for i in range(nvalues):
+
 	print("Calcolo grandezze ellissometriche e vettori Stokes")
 	print("Angolo incidente ", theta[i]*180/pi, "°")
 	print()
@@ -95,13 +96,6 @@ for i in range(nvalues):
 	#Calcolo col formalismo dei quaternioni	
 	r.generic_polarization(1, 1)	#vettore di Stokes incidente1, polarizzazione lineare 
 	s = Quaternion( r.I(), r.Q()*I, r.U()*I, r.V()*I )	#quaternione corrispondente al vett Stoke
-
-    #controllo
-	print("vettore di Stokes iniziale")
-	print(r.parameters[0])
-	print(r.parameters[1])
-	print(r.parameters[2])
-	print(r.parameters[3])
 
 	#quaternioni finali corrispondenti ai raggi
 	h1, h1daga = multiplication([hrif1dw])

@@ -34,7 +34,6 @@ class interazione:
         col = ['h_mat', 'h_rif_up', 'h_rif_dw', 'h_tra_dw', 'h_tra_up']
         self.biquaternions = pd.DataFrame(0, righe, col)
         self.biquaternions = self.biquaternions.astype(object)
-        print('nrighe: ', righe)
         
         
         #lista con i quaternioni che dovrò usare per calcolare la differenze di fase prima di
@@ -56,20 +55,10 @@ class interazione:
         #inizializzazione del quaterione del raggio iniziale
         s_iniz = Quaternion(stokes_iniz.I(), stokes_iniz.Q()*I, stokes_iniz.U()*I, stokes_iniz.V()*I)
         self.s_quaternions = self.s_quaternions.append({'s': s_iniz, "provenienza": 0, "arrivo": 1, "h_partial": 1}, ignore_index=True)
-        
+
         self.nraggi = 1
         
-        '''
-        #inizializzo PER ORA qui con quaternioni e direzioni di propagazione di prova
 
-        ii = [1, 1]
-        jj = [0, 2]
-
-        s_input = [Quaternion(1, 2*I, 3*I, 4*I), Quaternion(5, 6*I, 7*I, 8*I)]
-        
-        for i in range(np.size(ii)):
-            self.s_quaternions = self.s_quaternions.append({'s': s_input[i], "provenienza": ii[i], "arrivo": jj[i]}, ignore_index=True)
-        '''
 
     def materials_to_mueller(self, theta0):
         
@@ -113,15 +102,8 @@ class interazione:
             self.muellers.loc[i, 'M_tra_up'] = np.array(mueller_class.mueller_transmission())
             self.muellers.loc[i, 'M_rif_up'] = np.array(mueller_class.mueller_reflection())
             
-            #print('rif alto a basso: ', mueller_class.mueller_reflection())
-            #print('tras alto a basso: ', mueller_class.mueller_transmission())
-            #print('rif basso a alto: ', mueller_class.mueller_reflection())
-            #print('tras basso a alto: ', mueller_class.mueller_transmission())
-            #print()
-           
         for i in range(self.campione.strati+1):
             
-            #print('elemento 00: ',self.muellers.loc[i, 'M_rif'][0,0])
             #normalizzo le matrici di Mueller
             M_mat_nr = normalize(self.muellers.loc[i, 'M_mat'])
             M_rif_dw_nr = normalize(self.muellers.loc[i, 'M_rif_dw'])
@@ -142,9 +124,6 @@ class interazione:
             h_rif_up = covariance_vector(H_rif_up)
             h_tra_dw = covariance_vector(H_tra_dw)
             h_tra_up = covariance_vector(H_tra_up)
-            
-            #print(H_rif) #NOTA: h_mat è autovettore di una matrice multipla dell'identità
-            #print()
             
             self.biquaternions.loc[i, 'h_mat']    = Quaternion(h_mat[0], h_mat[1]*I, h_mat[2]*I, h_mat[3]*I, real_field = False)
             self.biquaternions.loc[i, 'h_rif_dw'] = Quaternion(h_rif_dw[0], h_rif_dw[1]*I, h_rif_dw[2]*I, h_rif_dw[3]*I, real_field = False)
@@ -215,12 +194,7 @@ class interazione:
             jj_ = self.s_quaternions.loc[k, 'arrivo']
             h_part = self.s_quaternions.loc[k, 'h_partial'] #quaternione relativo alla propagazione precedente
             
-
-            #elimino raggi troppo flebili
-            #lo faccio attraverso l'intensità totale (DA CONTROLLARE, DIVERSO DAL PROGRAMMA VECCHIO)
-            #print('quaternion: ', s_)
             
-            print('s_.a: ',complex(s_.a))
             if abs(complex(s_.a)) > self.precisione: #CONTROLLA
                 
                 #tratto a parte il caso di raggi vicini alla superficie
@@ -239,7 +213,6 @@ class interazione:
                     #######################viene trasmesso e produce un nuovo cammino####################
                     #trasmissione
                     h_tra = self.biquaternions.loc[0, 'h_tra_dw']
-                    #print(self.biquaternions)
                     
                     #propagazione nel mezzo
                     h_mat = self.biquaternions.loc[1, 'h_mat']
@@ -360,25 +333,16 @@ class interazione:
         self.s_quaternions = self.s_quaternions.reset_index(drop = True)
             
         self.nraggi = self.s_quaternions.shape[0]
-        
+
+
+
     def interference(self):
-        
-        #print()
-        #print('s h fin', self.s_h_fin)
-        #h = self.s_h_fin.to_numpy()#.tolist()
-        #h = h[:,1].tolist()
-        
         h_ = []
-        
         for i in self.s_h_fin.index:
             if i != 0:
                 h_.append(self.s_h_fin['h_fin'][i])
         
         htot = Quaternion(0, 0, 0, 0)
-        
-        #print()
-        #print(h_)
-        
         for i in h_:
             htot += i
         
@@ -403,7 +367,6 @@ def conjugate(h):
 	alfa  =  np.conj(-h.b*I)
 	beta  =  np.conj(-h.c*I)
 	gamma =  np.conj(-h.d*I)
-	
 	return Quaternion( tau, alfa*I, beta*I, gamma*I )
 
      
@@ -411,10 +374,8 @@ def conjugate(h):
 def multiplication(arr):
 	
 	l = len(arr)
-
 	if l==1:
 		h = arr[0]
-		return [ h, conjugate(h) ]
 
 	else:
 		h = arr[l-2].mul(arr[l-1])
@@ -422,38 +383,39 @@ def multiplication(arr):
 			index = l-3-i
 			h = arr[index].mul(h)
 
-		return [ h, conjugate(h) ]
+	return [ h, conjugate(h) ]
 
 
 #Calcolo le grandezze ellissometriche Psi, delta
 #a partire dai quaternioni arr di un singolo raggio 
-def grandell(arr, s, svfinal=False, quatfinal=False):
+def grandell(arr, s, ellipsometry=True, svfinal=False, quatfinal=False):
 
 	h, hdaga = multiplication(arr)
-
 	shdaga = s.mul(hdaga)
 	sfin	= h.mul(shdaga)
 	rfin = stokes_vector( complex(sfin.a), complex(sfin.b*(-1j)), complex(sfin.c*(-1j)), complex(sfin.d*(-1j)) )  #vettore di Stokes finale
 	
-	hs = h.mul(s)			#prodotto hs tra quaternioni
-	shs = scalar_prod(s, hs)	#prodotto scalare s.hs
+	results = []
 
-	psi = rfin.ellipsometric_Psi().real
-    
-	delta = cmath.phase(shs).real
-	if delta < 0:
-		delta += 2*math.pi #CONTROLLA
+	if(ellipsometry==True):
+		psi = rfin.ellipsometric_Psi().real
 
-	if svfinal == False and quatfinal == False:
-		return [psi, delta]
+		hs = h.mul(s)			#prodotto hs tra quaternioni
+		shs = scalar_prod(s, hs)	#prodotto scalare s.hs
+		delta = cmath.phase(shs).real
+		if delta < 0:
+			delta += 2*math.pi #CONTROLLA
 
-	elif svfinal == True and quatfinal == False:
-		return [psi, delta, rfin]
+		results.append(psi)
+		results.append(delta)
 
-	elif svfinal == False and quatfinal == True:
-		return [psi, delta, sfin]
+	if(svfinal==True):
+		results.append(rfin)
 
-	else:
-		return [psi, delta, rfin, sfin]
+	if(quatfinal==True):
+		results.append(sfin)
 
-
+	if len(results)==1:
+		results = results[0]
+	
+	return results

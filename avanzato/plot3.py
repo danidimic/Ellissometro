@@ -25,7 +25,7 @@ camp = campione(n0, [n1, sp1, n2])
 sorg = sorgente(1.95954488, 1, 0.78539163) #per ora non uso i due argomenti a dx
 
 r = stokes_vector()			#inizializzo oggetto vettore di stokes
-inter = interazione(0.0001, camp, sorg)  #inizializzo oggetto interazione
+inter = interazione(0.0001, camp, sorg, r)  #inizializzo oggetto interazione
 
 Smm = []
 Qmm = []
