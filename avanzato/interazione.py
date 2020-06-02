@@ -10,6 +10,7 @@ from campione import campione
 from matrix import *
 from sympy import I
 from sympy.algebras.quaternion import Quaternion
+from jones import jones
 
 
 c=299792458; #(m/s);
@@ -17,7 +18,7 @@ h=4.13566743e-15; #(eV s)
 
 class interazione:
     
-    def __init__(self, precisione, campione, sorgente):
+    def __init__(self, precisione, campione, sorgente, stokes_iniz):
         
         self.campione = campione
         self.sorgente = sorgente
@@ -34,14 +35,15 @@ class interazione:
         self.biquaternions = pd.DataFrame(0, righe, col)
         self.biquaternions = self.biquaternions.astype(object)
         
+        
         #lista con i quaternioni che dovrò usare per calcolare la differenze di fase prima di
         #effettuare la combinazione lineare dei cammini (è GIUSTA L'IDEA?) e dei quaternioni 
         #dei rispettivi cammini
         righe = []
         col = ['s_fin', 'h_fin']
         self.s_h_fin = pd.DataFrame(0, righe, col)
-        self.s_h_fin = self.s_quaternions.astype(object)        
-
+        self.s_h_fin = self.s_h_fin.astype(object)        
+        
         
         #inizializzo il vettore con i quaternioni dei raggi durante la propagazione,
         #al SOLO RAGGIO INIZIALE (DA FARE)
@@ -50,6 +52,13 @@ class interazione:
         self.s_quaternions = pd.DataFrame(0, righe, col)
         self.s_quaternions = self.s_quaternions.astype(object)
         
+        #inizializzazione del quaterione del raggio iniziale
+        s_iniz = Quaternion(stokes_iniz.I(), stokes_iniz.Q()*I, stokes_iniz.U()*I, stokes_iniz.V()*I)
+        self.s_quaternions = self.s_quaternions.append({'s': s_iniz, "provenienza": 0, "arrivo": 1, "h_partial": 1}, ignore_index=True)
+        
+        self.nraggi = 1
+        
+        '''
         #inizializzo PER ORA qui con quaternioni e direzioni di propagazione di prova
 
         ii = [1, 1]
@@ -59,7 +68,8 @@ class interazione:
         
         for i in range(np.size(ii)):
             self.s_quaternions = self.s_quaternions.append({'s': s_input[i], "provenienza": ii[i], "arrivo": jj[i]}, ignore_index=True)
-        
+        '''
+
     def materials_to_mueller(self, theta0):
         
         '''
@@ -146,12 +156,57 @@ class interazione:
             self.biquaternions.loc[i, 'h_rif_up'] *= np.sqrt( self.muellers.loc[i, 'M_rif_up'][0,0] )
             self.biquaternions.loc[i, 'h_tra_dw'] *= np.sqrt( self.muellers.loc[i, 'M_tra_dw'][0,0] )
             self.biquaternions.loc[i, 'h_tra_up'] *= np.sqrt( self.muellers.loc[i, 'M_tra_up'][0,0] )
+            
+            
+    def materials_to_jones(self, theta0):
+        
+        '''
+        Raccoglie nel Data Frame, con indici di riga riferiti agli strati (0 
+        è il vuoto): matrice di Mueller relativa alla propagazione nel materiale 
+        (M_mat), matrice di Mueller relativa alla riflessione sull'interfaccia (in
+        basso) (M_rif), matrice di Mueller relativa alla trasmissione attraverso 
+        l'interfaccia (in basso) (M_tra). NOTA BENE: in questa versione del programma
+        considero il mezzo isotropo, per cui gli effetti della propagazione nel mezzo
+        non dipendono dal segno dell'angolo, né dal fatto che la luce propaghi dal basso
+        verso l'alto o viceversa.
+        '''
+        omega=2*math.pi*(self.sorgente.energia)/h;
+        wsuc=omega/c;
+        
+        #Il primo theta è quello con cui la luce parte dalla sorgente
+        theta_start = theta0
+        
+        for i in range(self.campione.strati+1):
+        
+            #inizializzo al layer a cui sono arrivato
+            n0 = self.campione.nc[i] # questo deve essere coerente con...
+            n1 = self.campione.nc[i+1] #...
+            spessore = self.campione.spessori[i] # ...questo!
 
-    def propagazione():
-    
-        nraggi = self.s_quaternions.shape[0]
+            jones_class = jones(n0, n1, theta_start, wsuc, spessore)
+        
+            tau_mat, alfa_mat, beta_mat, gamma_mat = jones_class.jones_propagation()
+            self.biquaternions.loc[i, 'h_mat'] = Quaternion(tau_mat, alfa_mat*I, beta_mat*I, gamma_mat*I)
+            
+            tau_rif_dw, alfa_rif_dw, beta_rif_dw, gamma_rif_dw = jones_class.jones_reflection()
+            self.biquaternions.loc[i, 'h_rif_dw'] = Quaternion(tau_rif_dw, alfa_rif_dw*I, beta_rif_dw*I, gamma_rif_dw*I)
+            
+            tau_tra_dw, alfa_tra_dw, beta_tra_dw, gamma_tra_dw = jones_class.jones_transmission()
+            self.biquaternions.loc[i, 'h_tra_dw'] = Quaternion(tau_tra_dw, alfa_tra_dw*I, beta_tra_dw*I, gamma_tra_dw*I)
+            
+            theta_start = jones_class.theta1
+            jones_class = jones(n1, n0, theta_start, wsuc, spessore)
+            
+            tau_rif_up, alfa_rif_up, beta_rif_up, gamma_rif_up = jones_class.jones_reflection()
+            self.biquaternions.loc[i, 'h_rif_up'] = Quaternion(tau_rif_up, alfa_rif_up*I, beta_rif_up*I, gamma_rif_up*I)
 
-        for k in range(nraggi):        
+            tau_tra_up, alfa_tra_up, beta_tra_up, gamma_tra_up = jones_class.jones_transmission()
+            self.biquaternions.loc[i, 'h_tra_up'] = Quaternion(tau_tra_up, alfa_tra_up*I, beta_tra_up*I, gamma_tra_up*I)
+            
+
+    def propagazione(self):
+
+        for k in range(self.nraggi):        
             
             #raggio che considero
             s_ = self.s_quaternions.loc[k, 's']
@@ -174,7 +229,7 @@ class interazione:
                     shdaga = s_.mul(hdaga)
                     sfin	= h.mul(shdaga)
                     
-                    self.s_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
+                    self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
                     #####################################################################################
                     
                     #######################viene trasmesso e produce un nuovo cammino####################
@@ -184,7 +239,7 @@ class interazione:
                     #propagazione nel mezzo
                     h_mat = self.biquaternions.loc[1, 'h_mat']
                     
-                    h, hdaga = multiplication([h_tra, h_mat])                    
+                    h, hdaga = multiplication([h_mat, h_tra])                    
                     shdaga = s_.mul(hdaga)
                     sfin = h.mul(shdaga)
                     
@@ -197,13 +252,12 @@ class interazione:
                     ######################viene trasmesso, e il cammino finisce qui!#####################
                     #non considero effetti di propagazione nell'aria (si può aggiungere, con h_mat indice 0)
                     
-                    h = h_part.mul(self.biquaternions.loc[0, 'h_tra_up']) #aggiungo l'ultimo pezzo di trasmissione
-                    
-                    hdaga = conjugate(h)
+                    h, hdaga = multiplication([self.biquaternions.loc[0, 'h_tra_up'], h_part]) #aggiungo l'ultimo pezzo di trasmissione
+
                     shdaga = s_.mul(hdaga)
                     sfin	= h.mul(shdaga)
                     
-                    self.s_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
+                    self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
                     #####################################################################################                    
                     
                     ###################viene riflesso in basso e produce un nuovo cammino################
@@ -213,7 +267,7 @@ class interazione:
                     #propagazione nel mezzo
                     h_mat = self.biquaternions.loc[1, 'h_mat']
                     
-                    h, hdaga = multiplication([h_part, h_rif, h_mat])      
+                    h, hdaga = multiplication([ h_mat, h_rif, h_part])      
                     shdaga = s_.mul(hdaga)
                     sfin = h.mul(shdaga)
                     
@@ -233,7 +287,7 @@ class interazione:
                         #propagazione nel mezzo jj_
                         h_mat = self.biquaternions.loc[jj_, 'h_mat']
                         
-                        h, hdaga = multiplication([h_part, h_tra, h_mat])      
+                        h, hdaga = multiplication([h_mat, h_tra, h_part])      
                         shdaga = s_.mul(hdaga)
                         sfin = h.mul(shdaga)
                         
@@ -249,7 +303,7 @@ class interazione:
                         #propagazione nel mezzo ii_
                         h_mat = self.biquaternions.loc[ii_, 'h_mat']
                         
-                        h, hdaga = multiplication([h_part, h_tra, h_mat])      
+                        h, hdaga = multiplication([h_mat, h_rif, h_part])      
                         shdaga = s_.mul(hdaga)
                         sfin = h.mul(shdaga)
                         
@@ -268,7 +322,7 @@ class interazione:
                         #propagazione nel mezzo jj_
                         h_mat = self.biquaternions.loc[jj_, 'h_mat']
                         
-                        h, hdaga = multiplication([h_part, h_tra, h_mat])      
+                        h, hdaga = multiplication([h_mat, h_tra, h_part])      
                         shdaga = s_.mul(hdaga)
                         sfin = h.mul(shdaga)
                         
@@ -284,7 +338,7 @@ class interazione:
                         #propagazione nel mezzo ii_
                         h_mat = self.biquaternions.loc[ii_, 'h_mat']
                         
-                        h, hdaga = multiplication([h_part, h_tra, h_mat])      
+                        h, hdaga = multiplication([h_mat, h_rif, h_part])      
                         shdaga = s_.mul(hdaga)
                         sfin = h.mul(shdaga)
                         
@@ -292,6 +346,19 @@ class interazione:
                         self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_, "arrivo": jj_ + 2, "h_partial": h}, ignore_index=True)
 
                         #####################################################################################
+                        
+        self.nraggi = self.s_quaternions.shape[0]
+        
+    def interference(self):
+        
+        h = self.s_h_fin[:,'h'].to_numpy().tolist()
+        print(h)
+        htot = Quaternion(0, 0, 0, 0)
+        
+        for i in h:
+            htot += i
+        
+        return htot
 
 #Normalizzazione della matrice di Mueller       
 def normalize(Mueller_mat):
@@ -345,10 +412,13 @@ def grandell(arr, s, svfinal=False, quatfinal=False):
 	rfin = stokes_vector( complex(sfin.a), complex(sfin.b*(-1j)), complex(sfin.c*(-1j)), complex(sfin.d*(-1j)) )  #vettore di Stokes finale
 	
 	hs = h.mul(s)			#prodotto hs tra quaternioni
-	shs = scalar_prod(h, hs)	#prodotto scalare s.hs
+	shs = scalar_prod(s, hs)	#prodotto scalare s.hs
 
 	psi = rfin.ellipsometric_Psi().real
+    
 	delta = cmath.phase(shs).real
+	if delta < 0:
+		delta += 2*math.pi #CONTROLLA
 
 	if svfinal == False and quatfinal == False:
 		return [psi, delta]

@@ -21,7 +21,7 @@ class jones:
         J_12 = 0
         J_21 = 0
         J_22 = np.exp(-1j*phase)
-        print('phase: ', np.exp(-1j*phase))
+        #print('phase: ', np.exp(-1j*phase))
         
         return calcola_parametri(J_11, J_12, J_21, J_22)
     

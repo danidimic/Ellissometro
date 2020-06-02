@@ -115,15 +115,19 @@ class stokes_vector:
 	#TODO Da controllare!!
 	#Calcolo del parametro ellissometrico Delta
 	def ellipsometric_Delta(self):
-		x = self.parameters[3]/self.parameters[0]
+		''' OLD
+        x = self.parameters[3]/self.parameters[0]
 
 		y = self.parameters[2]/self.parameters[1]
 		numeratore = x*np.sqrt(y**2+1)
 		denominatore = y*np.sqrt(1-x**2)
 		#denominatore = np.sin(np.arctan(y))
 		#numeratore = np.tan(np.arcsin(x))
+        '''
+		numeratore = self.parameters[3]
+		denominatore = self.parameters[2]
         
-		return numeratore/denominatore
+		return np.arctan(numeratore/denominatore)
 
 		
 

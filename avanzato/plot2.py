@@ -9,7 +9,7 @@ from stokes import stokes_vector
 from sorgente import sorgente
 from campione import campione
 from interazione import *
-
+from jones import *
 
 #indici rifrzione
 n0 = 1
@@ -41,7 +41,7 @@ V = []
 Psi = []
 Delta = []
 
-nvalues = 100
+nvalues = 50
 theta = np.linspace(0, pi/2, nvalues)
 
 for i in range(nvalues):
@@ -96,6 +96,13 @@ for i in range(nvalues):
 	r.generic_polarization(1, 1)	#vettore di Stokes incidente1, polarizzazione lineare 
 	s = Quaternion( r.I(), r.Q()*I, r.U()*I, r.V()*I )	#quaternione corrispondente al vett Stoke
 
+    #controllo
+	print("vettore di Stokes iniziale")
+	print(r.parameters[0])
+	print(r.parameters[1])
+	print(r.parameters[2])
+	print(r.parameters[3])
+
 	#quaternioni finali corrispondenti ai raggi
 	h1, h1daga = multiplication([hrif1dw])
 	h2, h2daga = multiplication([htra1up, hmat, hrif2dw, hmat, htra1dw])
@@ -114,8 +121,8 @@ for i in range(nvalues):
 Psi = np.dot(Psi, 180/pi)
 Delta = np.dot(Delta, 180/pi)
 
-#Psimm = np.dot(Psimm, 180/pi)
-#Deltamm = np.dot(Deltamm, 180/pi)
+Psimm = np.dot(Psimm, 180/pi)
+Deltamm = np.dot(Deltamm, 180/pi)
 
 '''
 plt.title("Calcolo tramite Mueller")

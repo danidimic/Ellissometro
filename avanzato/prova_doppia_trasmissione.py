@@ -13,7 +13,7 @@ from interazione import *
 c=299792458; #(m/s);
 h=4.13566743e-15; #(eV s)
 
-nc = 1 + 0.000j
+nc = 1
 
 #definisco la sorgente
 sorg = sorgente(1.95954488, 1, 0.78539163) #per ora non uso i due argomenti a dx
@@ -30,7 +30,7 @@ nvalues = 1
 theta_vect = np.linspace(0, pi/2, nvalues)
 
 spessore1 = 0.0001
-spessore2 = 0.0001 + 6.327193201669579e-07/2.
+spessore2 = 0.0001 + lunghezza_donda/2.
 
 S = []
 Q = []

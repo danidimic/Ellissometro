@@ -92,7 +92,7 @@ class MM:
         tau_pi = 2*r/(1+b);	  #coefficiente di trasmissione onda p
         
         Ts= abs(tau_sigma)**2 #riflettività onda s
-        Tp= abs(tau_pi)**2    #riflettività onda s
+        Tp= abs(tau_pi)**2    #riflettività onda p
         
         # creo la matrice di Mueller
         Ths=(Ts+Tp)/2
@@ -116,11 +116,12 @@ class MM:
         
         phase = self.wsuc*self.nc0*(self.spessore/np.cos(self.theta0))
         #print('phase: ',phase)
-        attenuazione = abs(np.exp(-1j*phase))
+        exp_phase = np.exp(-1j*phase)
+        attenuazione = abs(exp_phase)
         #print('attenuazione: ', attenuazione)
         M = np.zeros( (4,4) )
         M[0,0] = attenuazione
         M[1,1] = attenuazione
         M[2,2] = attenuazione
         M[3,3] = attenuazione
-        return M
+        return exp_phase, M

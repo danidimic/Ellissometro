@@ -72,7 +72,14 @@ for i in range(nval):
 		
     tau1_sigma = 2/(1+a)		  #trasmissività ortogonale
     tau1_pi = 2*r/(1+b);		  #trasmissività parallela
-
+    
+    #coefficiente di fresnel di trasmissione up
+    r = camp.nc[1]/camp.nc[0]
+    a = camp.nc[0]/camp.nc[1]*cmath.cos(theta0)/cmath.cos(theta1)
+    b = (r**2)*a
+    
+    tau1_sigma_up = 2/(1+a)		  #trasmissività ortogonale
+    tau1_pi_up = 2*r/(1+b);		  #trasmissività parallela
 
     theta2 = cmath.asin( camp.nc[1]*cmath.sin(theta1)/camp.nc[2] )
 
@@ -120,8 +127,8 @@ for i in range(nval):
     y_pi_int2 = y_pi_int2*cmath.exp(phase*1j)
 
     #...viene trasmesso dalla prima interfaccia
-    y_sigma_fin2 = y_sigma_int2*tau1_sigma
-    y_pi_fin2 = y_pi_int2*tau1_pi #CONTROLLA
+    y_sigma_fin2 = y_sigma_int2*tau1_sigma_up
+    y_pi_fin2 = y_pi_int2*tau1_pi_up #CONTROLLA
 
     ################################ INTERFERENZA ###############################
 
@@ -138,7 +145,7 @@ for i in range(nval):
 #plot
 #Grafico di I, Q, U, V
 plt.title("Metodo standard")
-plt.xlabel("angolo incidente [°]")
+plt.xlabel("angolo incidente [rad]")
 plt.ylabel("$I$ | $Q$ [°]")
 plt.plot(Theta, I, label='$I$')
 plt.plot(Theta, Q, label='$Q$')
