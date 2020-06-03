@@ -39,11 +39,13 @@ Q = []
 U = []
 V = []
 
-nvalues = 100
+nvalues = 50
 theta = np.linspace(0, pi/2, nvalues)
 
 for i in range(nvalues):
-   
+    
+	print()
+	print('***********************************************')
 	print("Angolo di incidenza ", round(180/pi * theta[i], 2), "°")
 	print()
 	

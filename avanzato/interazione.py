@@ -142,13 +142,13 @@ class interazione:
         
         '''
         Raccoglie nel Data Frame, con indici di riga riferiti agli strati (0 
-        è il vuoto): matrice di Mueller relativa alla propagazione nel materiale 
-        (M_mat), matrice di Mueller relativa alla riflessione sull'interfaccia (in
-        basso) (M_rif), matrice di Mueller relativa alla trasmissione attraverso 
-        l'interfaccia (in basso) (M_tra). NOTA BENE: in questa versione del programma
-        considero il mezzo isotropo, per cui gli effetti della propagazione nel mezzo
-        non dipendono dal segno dell'angolo, né dal fatto che la luce propaghi dal basso
-        verso l'alto o viceversa.
+        è il vuoto): quaternione ottenuto da matrice di Jones relativa alla propagazione 
+        nel materiale (h_mat), quaternioni ottenuti da matrici di Jones relative alla 
+        riflessione sull'interfaccia (in basso) (h_rif_up/_dw), quaternioni ottenuti da 
+        matrici di Jones relative alla trasmissione attraverso l'interfaccia (in basso) 
+        (h_tra_up/dw). NOTA BENE: in questa versione del programma considero il mezzo 
+        isotropo, per cui gli effetti della propagazione nel mezzo non dipendono dal 
+        segno dell'angolo, né dal fatto che la luce propaghi dal basso verso l'alto o viceversa.
         '''
         omega=2*math.pi*(self.sorgente.energia)/h;
         wsuc=omega/c;
@@ -194,6 +194,11 @@ class interazione:
             jj_ = self.s_quaternions.loc[k, 'arrivo']
             h_part = self.s_quaternions.loc[k, 'h_partial'] #quaternione relativo alla propagazione precedente
             
+            print()
+            print('Raggio ', k+1)
+            print('  ii = ', ii_)
+            print('  jj = ', jj_)
+            print('  intensità = ', abs(complex(s_.a)))
             
             if abs(complex(s_.a)) > self.precisione: #CONTROLLA
                 
@@ -223,6 +228,7 @@ class interazione:
                     
                     #questo lo aggiungo al DF dei raggi
                     self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2, "h_partial": h}, ignore_index=True)
+                    #print('s, h, final: ',self.s_h_fin)
                     #####################################################################################
 
                 elif ii_ == 1 and jj_ == 0:
@@ -236,6 +242,7 @@ class interazione:
                     sfin	= h.mul(shdaga)
                     
                     self.s_h_fin = self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
+                    #print('s, h, final: ',self.s_h_fin)
 
                     #####################################################################################                    
                     
@@ -339,8 +346,13 @@ class interazione:
     def interference(self):
         h_ = []
         for i in self.s_h_fin.index:
-            if i != 0:
-                h_.append(self.s_h_fin['h_fin'][i])
+            #if i != 0:
+            h_.append(self.s_h_fin['h_fin'][i])
+        
+        print('***********************************************')
+        print('Interferenza fra i cammini: ')
+        for i in h_:
+            print(complex(i.a), ' + ', complex(i.b), 'i + ',complex(i.c), 'j + ',complex(i.d), 'k')
         
         htot = Quaternion(0, 0, 0, 0)
         for i in h_:
