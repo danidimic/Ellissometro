@@ -420,8 +420,10 @@ def grandell(arr, s, ellipsometry=True, svfinal=False, quatfinal=False):
 		'''
         
 		rho = (np.tan(rfin.alfa())*np.exp(1j*rfin.delta()))/(np.tan(rin.alfa())*np.exp(1j*rin.delta()))
-		psi = cmath.atan((rho))
-		delta = cmath.phase(rho)
+		#psi = cmath.atan((rho))
+		#delta = cmath.phase(rho)
+		psi = np.arctan(np.tan(rfin.ellipsometric_Psi())/np.tan(rin.ellipsometric_Psi()))
+		delta = cmath.phase(rin.ell_delta()) - cmath.phase(rfin.ell_delta())
         
 		if delta < 0:
 			delta += 2*math.pi #CONTROLLA

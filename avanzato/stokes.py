@@ -129,6 +129,10 @@ class stokes_vector:
         
 		return np.arctan(numeratore/denominatore)
 
+	def ell_delta(self):
+		Ex, Ey = self.electric_components()
+		return (self.U()-1j*self.V())/ (2*Ey*Ex)
+      
 	def alfa(self):
 		return 0.5*abs(np.arccos(self.Q()/self.I()))
     

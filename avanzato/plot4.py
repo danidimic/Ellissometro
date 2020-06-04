@@ -39,7 +39,7 @@ Q = []
 U = []
 V = []
 
-nvalues = 50
+nvalues = 90
 theta = np.linspace(0, pi/2, nvalues)
 
 for i in range(nvalues):
