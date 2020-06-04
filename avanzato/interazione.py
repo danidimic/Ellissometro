@@ -406,15 +406,23 @@ def grandell(arr, s, ellipsometry=True, svfinal=False, quatfinal=False):
 	shdaga = s.mul(hdaga)
 	sfin	= h.mul(shdaga)
 	rfin = stokes_vector( complex(sfin.a), complex(sfin.b*(-1j)), complex(sfin.c*(-1j)), complex(sfin.d*(-1j)) )  #vettore di Stokes finale
-	
+	rin = stokes_vector( complex(s.a), complex(s.b*(-1j)), complex(s.c*(-1j)), complex(s.d*(-1j)) )  #vettore di Stokes iniziale
+    
 	results = []
 
 	if(ellipsometry==True):
-		psi = rfin.ellipsometric_Psi().real
+		'''
+        psi = rfin.ellipsometric_Psi().real
 
-		hs = h.mul(s)			#prodotto hs tra quaternioni
+        hs = h.mul(s)			#prodotto hs tra quaternioni
 		shs = scalar_prod(s, hs)	#prodotto scalare s.hs
 		delta = cmath.phase(shs).real
+		'''
+        
+		rho = (np.tan(rin.alfa())*np.exp(1j*rin.delta()))/(np.tan(rfin.alfa())*np.exp(1j*rfin.delta()))
+		psi = np.arctan(abs(rho))
+		delta = cmath.phase(rho)
+        
 		if delta < 0:
 			delta += 2*math.pi #CONTROLLA
 

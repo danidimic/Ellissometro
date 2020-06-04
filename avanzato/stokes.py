@@ -129,7 +129,14 @@ class stokes_vector:
         
 		return np.arctan(numeratore/denominatore)
 
-		
+	def alfa(self):
+		return 0.5*abs(np.arccos(self.Q()/self.I()))
+    
+	def delta(self):
+		delta = np.arctan(self.V()/self.U())
+		if delta < 0:
+			delta += 2*math.pi
+		return delta
 
 	#Prodotto per una matrice mueller
 	def mueller_product(self, mat):
