@@ -111,29 +111,15 @@ class stokes_vector:
 		Ey = np.sqrt( (S0-S1)/2 )
 		return [Ex, Ey]
 
+
+
 	#Calcolo del parametro ellissometrico Psi
 	def ellipsometric_Psi(self):
 		Ex, Ey = self.electric_components()
 		return np.arctan(Ey/Ex)
 
-	#TODO Da controllare!!
 	#Calcolo del parametro ellissometrico Delta
 	def ellipsometric_Delta(self):
-		''' OLD
-        x = self.parameters[3]/self.parameters[0]
-
-		y = self.parameters[2]/self.parameters[1]
-		numeratore = x*np.sqrt(y**2+1)
-		denominatore = y*np.sqrt(1-x**2)
-		#denominatore = np.sin(np.arctan(y))
-		#numeratore = np.tan(np.arcsin(x))
-        '''
-		numeratore = self.parameters[3]
-		denominatore = self.parameters[2]
-        
-		return np.arctan(numeratore/denominatore)
-
-	def ell_delta(self):
 		Ex, Ey = self.electric_components()
 		return (self.U()-1j*self.V())/ (2*Ey*Ex)
       
@@ -146,18 +132,12 @@ class stokes_vector:
 			delta += 2*math.pi
 		return delta
 
+
+
 	#Prodotto per una matrice mueller
 	def mueller_product(self, mat):
 		product = np.dot(mat, self.parameters)
 		self.parameters = product
-
-	#Interazione del vettore di Stokes con uno strato del campione
-	#dato nell'ordine da riflessione, propagazione e trasmissione
-	def layer_interaction(self, M_ref, M_trasm, M_layer):
-		#matrice totale per l'interazione con lo strato
-		Mtot = np.dot( M_trasm, np.dot(M_layer, M_ref) )
-
-		self.mueller_product(Mtot)
 
 
 

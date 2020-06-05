@@ -10,7 +10,7 @@ class jones:
         self.theta0=theta0
         self.wsuc=wsuc
         self.spessore=spessore
-        self.theta1 = cmath.asin( nc0.real*cmath.sin(theta0)/nc1.real )
+        self.theta1 = cmath.asin( nc0*cmath.sin(theta0)/nc1 )
     
     def jones_propagation(self):
         
@@ -29,8 +29,8 @@ class jones:
         nc0=self.nc0
         nc1=self.nc1
         theta0=self.theta0
-        
         theta1 = self.theta1
+
         r = nc0/nc1
         a = nc1/nc0*cmath.cos(theta1)/cmath.cos(theta0)
         b = (r**2)*a
@@ -64,7 +64,8 @@ class jones:
         J_22 = rho_pi         
         
         return calcola_parametri(J_11, J_12, J_21, J_22)
-        
+    
+    
 def calcola_parametri(J_11, J_12, J_21, J_22):
 
     tau = (J_11 + J_22)/2.

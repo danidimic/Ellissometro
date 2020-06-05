@@ -147,10 +147,9 @@ class interazione:
         isotropo, per cui gli effetti della propagazione nel mezzo non dipendono dal 
         segno dell'angolo, né dal fatto che la luce propaghi dal basso verso l'alto o viceversa.
         '''
-        wsuc = self.sorgente.wsuc
-        
         #Il primo theta è quello con cui la luce parte dalla sorgente
         theta_start = theta0
+        wsuc = self.sorgente.wsuc
         
         for i in range(self.campione.strati+1):
         
@@ -190,11 +189,11 @@ class interazione:
             jj_ = self.s_quaternions.loc[k, 'arrivo']
             h_part = self.s_quaternions.loc[k, 'h_partial'] #quaternione relativo alla propagazione precedente
             
-            print()
-            print('Raggio ', k+1)
-            print('  ii = ', ii_)
-            print('  jj = ', jj_)
-            print('  intensità = ', abs( s_.a ))
+            #print()
+            #print('Raggio ', k+1)
+            #print('  ii = ', ii_)
+            #print('  jj = ', jj_)
+            #print('  intensità = ', abs( s_.a ))
             
             if abs( s_.a ) > self.precisione: #CONTROLLA
                 
@@ -224,7 +223,6 @@ class interazione:
                     
                     #questo lo aggiungo al DF dei raggi
                     self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2, "h_partial": h}, ignore_index=True)
-                    #print('s, h, final: ',self.s_h_fin)
                     #####################################################################################
 
                 elif ii_ == 1 and jj_ == 0:
@@ -238,7 +236,6 @@ class interazione:
                     sfin	= h.mul(shdaga)
                     
                     self.s_h_fin = self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
-                    #print('s, h, final: ',self.s_h_fin)
 
                     #####################################################################################                    
                     
@@ -342,13 +339,11 @@ class interazione:
     def interference(self):
         h_ = []
         for i in self.s_h_fin.index:
-            #if i != 0:
             h_.append(self.s_h_fin['h_fin'][i])
         
         print('***********************************************')
         print('Interferenza fra i cammini: ')
         for i in h_:
-            #print(complex(i.a), ' + ', complex(i.b), 'i + ',complex(i.c), 'j + ',complex(i.d), 'k')
             print(i)        
 
         htot = Biquaternion(0, 0, 0, 0)
@@ -369,7 +364,7 @@ def normalize(Mueller_mat):
      
 #Moltiplicazione di quaternioni per ottenere h, hdaga
 def multiplication(arr):
-	
+
 	l = len(arr)
 	if l==1:
 		h = arr[0]
@@ -407,12 +402,12 @@ def grandell(arr, s, ellipsometry=True, svfinal=False, quatfinal=False):
 		#psi = cmath.atan((rho))
 		#delta = cmath.phase(rho)
 		'''
-
+		#calcolo le grandezze ellissometriche psi, delta
 		psi = np.arctan( np.tan(rfin.ellipsometric_Psi()) / np.tan(rin.ellipsometric_Psi()) )
-		delta = cmath.phase(rin.ell_delta()) - cmath.phase(rfin.ell_delta())
+		delta = cmath.phase(rin.ellipsometric_Delta()) - cmath.phase(rfin.ellipsometric_Delta())
         
 		if delta < 0:
-			delta += 2*math.pi #CONTROLLA
+			delta += 2*math.pi
 
 		results.append(psi)
 		results.append(delta)

@@ -38,7 +38,7 @@ Q = []
 U = []
 V = []
 
-nvalues = 250
+nvalues = 100
 theta = np.linspace(0, pi/2, nvalues)
 
 for i in range(nvalues):
@@ -49,7 +49,7 @@ for i in range(nvalues):
 	print()
 	
     #calcolo le interazioni di tutti i possibili raggi con le interfacce
-	inter = interazione(0.00001, camp, sorg, riniz)  #inizializzo oggetto interazione
+	inter = interazione(0.0001, camp, sorg, riniz)  #inizializzo oggetto interazione
 	inter.materials_to_jones(theta[i])
     
 	while inter.nraggi != 0:
@@ -77,7 +77,7 @@ Psi = np.dot(Psi, 180/pi)
 Delta = np.dot(Delta, 180/pi)
 theta = np.dot(theta, 180/pi)
 
-#Grafico dei risultati con quaternioni
+#Grafico delle componenti del vettore di Stokes
 plt.title("Componenti vettori di Stokes")
 plt.xlabel("Angolo incidente [°]")
 plt.plot(theta, S , label='I')
@@ -88,7 +88,7 @@ plt.grid(True)
 plt.legend()
 plt.show()
 
-#con i quaternioni
+#Grafico delle grandezze ellissometriche
 plt.title("Grandezze ellissometriche")
 plt.xlabel("Angolo incidente [°]")
 plt.plot(theta, Psi, label='$\Psi$')
