@@ -11,7 +11,7 @@ r_sigma = []
 delta1 = []
 psi1 = []
 Theta = []
-E = ellissometro(0.0001)
+E = ellissometro(0.5)
 
 for i in range(nvalues):
 	theta = passo*i  #angoli theta iniziali
@@ -29,7 +29,9 @@ for i in range(nvalues):
 	#calcolo dei moduli quadri
 	r_pi[i] = abs(r_pi[i])**2
 	r_sigma[i] = abs(r_sigma[i])**2
-	
+    
+Theta = np.dot(Theta, 180/math.pi)
+
 
 #Grafico di Delta e Psi
 plt.xlabel("angolo incidente [°]")

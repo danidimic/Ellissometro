@@ -42,6 +42,8 @@ for i in range(nvalues):
 	U.append(2*abs(r_sigma[i])*abs(r_pi[i])*np.cos(res[2]))
 	V.append(2*abs(r_sigma[i])*abs(r_pi[i])*np.sin(res[2]))
     
+Theta = np.dot(Theta, 180/math.pi)    
+
 #Grafico di Delta e Psi
 plt.xlabel("angolo incidente [°]")
 plt.ylabel("$\Delta$ | $\Psi$ [°]")
