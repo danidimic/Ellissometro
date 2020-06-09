@@ -163,7 +163,7 @@ class interazione:
 		#individuo i raggi che salgono e quelli che scendono
 		for x in range (0, nraggi): #ci va un +1?
 		    #elimino raggi troppo flebili
-		    if abs(x_pi[x])+abs(x_sigma[x])>self.precisione:
+		    if (abs(x_pi[x]))**2+(abs(x_sigma[x]))**2>self.precisione: #abs(x_pi[x])+abs(x_sigma[x])>self.precisione:
 		        #print("ii_superficial all'ingresso': ", ii_superficial_dt, ii_superficial_ur)
 		           
 		        #se i raggi sono nel mezzo, ho un raggio riflesso, che risolvo subito, e uno trasmesso sotto
