@@ -38,10 +38,10 @@ class jones:
         tau_sigma = 2/(1+a);  #coefficiente di trasmissione onda s
         tau_pi = 2*r/(1+b);	  #coefficiente di trasmissione onda p
 
-        J_11 = tau_sigma       
+        J_11 = np.conjugate(tau_sigma)       
         J_12 = 0
         J_21 = 0
-        J_22 = tau_pi        
+        J_22 = np.conjugate(tau_pi)        
         
         return calcola_parametri(J_11, J_12, J_21, J_22)
     
@@ -58,10 +58,10 @@ class jones:
         rho_sigma = (1-a)/(1+a);  #riflessività ortogonale
         rho_pi = (1-b)/(1+b);	  #riflessività parallela
 
-        J_11 = rho_sigma       
+        J_11 = np.conjugate(rho_sigma)       
         J_12 = 0
         J_21 = 0
-        J_22 = rho_pi         
+        J_22 = np.conjugate(rho_pi)           
         
         return calcola_parametri(J_11, J_12, J_21, J_22)
     

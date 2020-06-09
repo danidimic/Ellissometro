@@ -232,8 +232,9 @@ class interazione:
                     
                     h, hdaga = multiplication([self.biquaternions.loc[0, 'h_tra_up'], h_part]) #aggiungo l'ultimo pezzo di trasmissione
 
-                    shdaga = s_.mul(hdaga)
-                    sfin	= h.mul(shdaga)
+                    h_mul, h_muldaga = multiplication([self.biquaternions.loc[0, 'h_tra_up']])
+                    shdaga = s_.mul(h_muldaga)
+                    sfin	= h_mul.mul(shdaga)
                     
                     self.s_h_fin = self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
 
@@ -246,9 +247,12 @@ class interazione:
                     #propagazione nel mezzo
                     h_mat = self.biquaternions.loc[1, 'h_mat']
                     
-                    h, hdaga = multiplication([ h_mat, h_rif, h_part])      
-                    shdaga = s_.mul(hdaga)
-                    sfin = h.mul(shdaga)
+                    h, hdaga = multiplication([ h_mat, h_rif, h_part])
+                    
+                    h_mul, h_muldaga = multiplication([ h_mat, h_rif])
+                    
+                    shdaga = s_.mul(h_muldaga)
+                    sfin	= h_mul.mul(shdaga)
                     
                     #questo lo aggiungo al DF dei raggi
                     self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2, "h_partial": h}, ignore_index=True)
@@ -267,9 +271,12 @@ class interazione:
                             #propagazione nel mezzo jj_
                             h_mat = self.biquaternions.loc[jj_, 'h_mat']
                             
-                            h, hdaga = multiplication([h_mat, h_tra, h_part])      
-                            shdaga = s_.mul(hdaga)
-                            sfin = h.mul(shdaga)
+                            h, hdaga = multiplication([h_mat, h_tra, h_part])
+                            
+                            h_mul, h_muldaga = multiplication([ h_mat, h_tra])
+                    
+                            shdaga = s_.mul(h_muldaga)
+                            sfin	= h_mul.mul(shdaga)
                         
                             #lo aggiungo al DF dei raggi
                             self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ + 1, "arrivo": jj_ + 1, "h_partial": h}, ignore_index=True)
@@ -283,9 +290,12 @@ class interazione:
                         #propagazione nel mezzo ii_
                         h_mat = self.biquaternions.loc[ii_, 'h_mat']
                         
-                        h, hdaga = multiplication([h_mat, h_rif, h_part])      
-                        shdaga = s_.mul(hdaga)
-                        sfin = h.mul(shdaga)
+                        h, hdaga = multiplication([h_mat, h_rif, h_part]) 
+                        
+                        h_mul, h_muldaga = multiplication([ h_mat, h_rif])
+                    
+                        shdaga = s_.mul(h_muldaga)
+                        sfin	= h_mul.mul(shdaga)
                         
                         #lo aggiungo al DF dei raggi
                         self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_, "arrivo": jj_ - 2, "h_partial": h}, ignore_index=True)
@@ -303,8 +313,11 @@ class interazione:
                         h_mat = self.biquaternions.loc[jj_, 'h_mat']
                         
                         h, hdaga = multiplication([h_mat, h_tra, h_part])      
-                        shdaga = s_.mul(hdaga)
-                        sfin = h.mul(shdaga)
+
+                        h_mul, h_muldaga = multiplication([ h_mat, h_tra])
+                    
+                        shdaga = s_.mul(h_muldaga)
+                        sfin	= h_mul.mul(shdaga)
                         
                         #lo aggiungo al DF dei raggi
                         self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ - 1, "arrivo": jj_ - 1, "h_partial": h}, ignore_index=True)
@@ -319,8 +332,11 @@ class interazione:
                         h_mat = self.biquaternions.loc[ii_, 'h_mat']
                         
                         h, hdaga = multiplication([h_mat, h_rif, h_part])      
-                        shdaga = s_.mul(hdaga)
-                        sfin = h.mul(shdaga)
+
+                        h_mul, h_muldaga = multiplication([ h_mat, h_rif])
+                    
+                        shdaga = s_.mul(h_muldaga)
+                        sfin	= h_mul.mul(shdaga)
                         
                         #lo aggiungo al DF dei raggi
                         self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_, "arrivo": jj_ + 2, "h_partial": h}, ignore_index=True)

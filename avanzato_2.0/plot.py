@@ -38,7 +38,7 @@ Q = []
 U = []
 V = []
 
-nvalues = 100
+nvalues = 300
 theta = np.linspace(0, pi/2, nvalues)
 
 for i in range(nvalues):
@@ -49,7 +49,7 @@ for i in range(nvalues):
 	print()
 	
     #calcolo le interazioni di tutti i possibili raggi con le interfacce
-	inter = interazione(0.0001, camp, sorg, riniz)  #inizializzo oggetto interazione
+	inter = interazione(0.5, camp, sorg, riniz)  #inizializzo oggetto interazione
 	inter.materials_to_jones(theta[i])
     
 	while inter.nraggi != 0:
