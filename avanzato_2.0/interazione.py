@@ -230,9 +230,9 @@ class interazione:
                     ######################viene trasmesso, e il cammino finisce qui!#####################
                     #non considero effetti di propagazione nell'aria (si può aggiungere, con h_mat indice 0)
                     
-                    h, hdaga = multiplication([self.biquaternions.loc[0, 'h_tra_up'], h_part]) #aggiungo l'ultimo pezzo di trasmissione
+                    h, hdaga = multiplication([self.biquaternions.loc[1, 'h_tra_up'], h_part]) #aggiungo l'ultimo pezzo di trasmissione
 
-                    h_mul, h_muldaga = multiplication([self.biquaternions.loc[0, 'h_tra_up']])
+                    h_mul, h_muldaga = multiplication([self.biquaternions.loc[1, 'h_tra_up']])
                     shdaga = s_.mul(h_muldaga)
                     sfin	= h_mul.mul(shdaga)
                     
