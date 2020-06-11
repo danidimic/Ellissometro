@@ -1,9 +1,9 @@
 import math
 import numpy as np
 
-nval = 100
+nval = 1000
 pi = math.pi
-theta = np.linspace(0, 180, nval)
+theta = np.linspace(0, 90, nval)
 names = []
 
 for i in range(nval):
@@ -15,6 +15,7 @@ for i in range(nval):
 #out = open("LOOP.DAT", 'w')
 #out.writelines(names)
 #out.close()
+
 
 resE1 = []
 resE2 = []
@@ -30,6 +31,8 @@ for i in range(nval):
 	mean = (E2[0] + E2[1]) / 2.
 	resE2.append(mean)
 
+E1 = np.column_stack((theta, resE1))
+E2 = np.column_stack((theta, resE2))
+np.savetxt("E1.txt", E1, delimiter='  ')
+np.savetxt("E2.txt", E2, delimiter='  ')
 
-np.savetxt("E1.txt", resE1, delimiter='  ')
-np.savetxt("E2.txt", resE2, delimiter='  ')

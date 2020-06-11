@@ -1,0 +1,33 @@
+###################################################
+############### 
+# 
+#   This macro instructs RefFIT to perform the actions described 
+#   in the RefFIT Manual (Tutorial section 3.2) 
+#   All input data are taken from the directory "..\PART2" 
+# 
+#   Written by A.Kuzmenko (2004) 
+# 
+###################################################
+############### 
+#------------------------------------------------------------------------------------ 
+# sets the dimensions and the title of the main (application) window  
+
+MainWindow(XPos = 0, YPos = 0, Width = 1024, Height = 740, Title = "macro example");
+NewModel(XPos = 0, YPos = 50, Width = 300, Height = 240);
+NewModel(XPos = 0, YPos = 295, Width = 300, Height = 240);
+NewModel(XPos = 50, YPos = 500, Width = 300, Height = 240);
+
+#modello del campione
+LoadModel(ModelNo = 1, File = "singleInterfaceModel.RFM");
+#funzione dielettrica dell'unico layer
+LoadModel(ModelNo = 2, File = "layerParameters.RFM");
+#funzione dielettrica del substrato
+LoadModel(ModelNo = 3, File = "substrateParameters.RFM");
+
+BeginLoop(LoopFile = "LOOP.DAT");
+	SetModelParam(ModelNo = 1, ParamName = "Wp", LorNo = 1, Value = %1); 
+
+	ExportModelCurve(File = "results/E1_theta%1.txt", ModelNo = 1, Quantity = "E1", XMin = 630.0, XMax = 632.0, XPts = 2);
+	ExportModelCurve(File = "results/E2_theta%1.txt", ModelNo = 1, Quantity = "E2", XMin = 630.0, XMax = 632.0, XPts = 2);
+
+EndLoop();
