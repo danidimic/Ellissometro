@@ -357,10 +357,10 @@ class interazione:
         for i in self.s_h_fin.index:
             h_.append(self.s_h_fin['h_fin'][i])
         
-        print('***********************************************')
-        print('Interferenza fra i cammini: ')
-        for i in h_:
-            print(i)        
+        #print('***********************************************')
+        #print('Interferenza fra i cammini: ')
+        #for i in h_:
+            #print(i)        
 
         htot = Biquaternion(0, 0, 0, 0)
         for i in h_:

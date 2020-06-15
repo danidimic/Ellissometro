@@ -1,30 +1,24 @@
 import math
 
+pi = math.pi
 c=299792458; #(m/s);
 h=4.13566743e-15; #(eV s)
 
-'''classe sorgente(E, psi, delta)
-
-Energia:			energia dei fotoni incidenti
-
-psi_0, delta_0: 	definiscono la polarizzazione iniziale (in termini di 
-					variazione rispetto alla polarizzazione lineare 
-					orientata a pi/4 rispetto al piano di incidenza).
-
-precisione:			definisce il limite per un "cut-off" sul fattore di 
-					ampiezza usato da propagazione che determina in base
-					a questo quando viene terminata la propagazione di 
-					ciascun singolo raggio. In qualche modo e' legato alla 
-					sensibilita' del rivelatore.'''
 
 class sorgente:
 
-	def __init__(self, E, psi, delta):
+	def __init__(self, lenght, energy=0, frequency=0):
 		
-		self.energia = E
-		self.psi_0 = psi
-		self.delta_0 = delta
+		#lunghezza d'onda della sorgente in nm
+		self.lunghezza = lenght
+		l = lenght*1e-9
 
-		omega=2*math.pi*(self.energia)/h;
-		self.wsuc=omega/c;
+		#energia della sorgente in eV
+		self.energia = h*c / l
+
+		#frequenza della sorgente in Hz
+		self.frequenza = c / l
+
+		#frequenza angolare in Hz normalizzata a c
+		self.wsuc = 2*pi*self.frequenza/c
 
