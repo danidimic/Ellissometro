@@ -33,6 +33,6 @@ for i in range(nval):
 
 E1 = np.column_stack((theta, resE1))
 E2 = np.column_stack((theta, resE2))
-np.savetxt("E1.txt", E1, delimiter='  ')
-np.savetxt("E2.txt", E2, delimiter='  ')
+np.savetxt("Psi.txt", E1, delimiter='  ')
+np.savetxt("Delta.txt", E2, delimiter='  ')
 

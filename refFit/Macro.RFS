@@ -17,9 +17,13 @@ NewModel(XPos = 0, YPos = 50, Width = 300, Height = 240);
 NewModel(XPos = 0, YPos = 295, Width = 300, Height = 240);
 NewModel(XPos = 50, YPos = 500, Width = 300, Height = 240);
 
-#modello del campione
-LoadModel(ModelNo = 1, File = "singleInterfaceModel.RFM");
-#funzione dielettrica dell'unico layer
+#modello del campione con una singola interfaccia (solo riflessione)
+LoadModel(ModelNo = 1, File = "modelSingleInterface.RFM");
+
+#modello del campione con due interfaccce (layer + substrato)
+#LoadModel(ModelNo = 1, File = "modelDoubleInterfaces.RFM");
+
+#funzione dielettrica del primo layer
 LoadModel(ModelNo = 2, File = "layerParameters.RFM");
 #funzione dielettrica del substrato
 LoadModel(ModelNo = 3, File = "substrateParameters.RFM");
