@@ -21,7 +21,7 @@ pi = math.pi
 camp = campione(n0, [n1, sp1, n2])
 
 #definisco la sorgente
-sorg = sorgente(lenght=630)
+sorg = sorgente(lenght=632.7193201669578)
 
 #definisco il raggio iniziale
 riniz = stokes_vector()
