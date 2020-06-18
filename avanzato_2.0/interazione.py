@@ -28,7 +28,7 @@ class interazione:
         self.muellers = self.muellers.astype(object)
         
         #inizializzo un Data Frame dove metterò i biquaternioni
-        col = ['h_mat', 'h_rif_up', 'h_rif_dw', 'h_tra_dw', 'h_tra_up']
+        col = ['h_mat', 'h_rif_up', 'h_rif_dw', 'h_tra_dw', 'h_tra_up', 'ang_lim_dw', 'ang_lim_up']
         self.biquaternions = pd.DataFrame(0, righe, col)
         self.biquaternions = self.biquaternions.astype(object)
         
@@ -152,13 +152,14 @@ class interazione:
         wsuc = self.sorgente.wsuc
         
         for i in range(self.campione.strati+1):
-        
+            
             #inizializzo al layer a cui sono arrivato
             n0 = self.campione.nc[i] # questo deve essere coerente con...
             n1 = self.campione.nc[i+1] #...
             spessore = self.campione.spessori[i] # ...questo!
 
             jones_class = jones(n0, n1, theta_start, wsuc, spessore)
+            self.biquaternions.loc[i, 'ang_lim_dw'] = jones_class.cfr_angolo_limite()
         
             tau_mat, alfa_mat, beta_mat, gamma_mat = jones_class.jones_propagation()
             self.biquaternions.loc[i, 'h_mat'] = Biquaternion(tau_mat, alfa_mat*1j, beta_mat*1j, gamma_mat*1j)
@@ -167,16 +168,25 @@ class interazione:
             self.biquaternions.loc[i, 'h_rif_dw'] = Biquaternion(tau_rif_dw, alfa_rif_dw*1j, beta_rif_dw*1j, gamma_rif_dw*1j)
             
             tau_tra_dw, alfa_tra_dw, beta_tra_dw, gamma_tra_dw = jones_class.jones_transmission()
-            self.biquaternions.loc[i, 'h_tra_dw'] = Biquaternion(tau_tra_dw, alfa_tra_dw*1j, beta_tra_dw*1j, gamma_tra_dw*1j)
+            
+            if self.biquaternions.loc[i, 'ang_lim_dw'] == 1:
+                self.biquaternions.loc[i, 'h_tra_dw'] = Biquaternion(tau_tra_dw, alfa_tra_dw*1j, beta_tra_dw*1j, gamma_tra_dw*1j)
             
             theta_start = jones_class.theta1
             jones_class = jones(n1, n0, theta_start, wsuc, spessore)
+            
+            self.biquaternions.loc[i, 'ang_lim_up'] = jones_class.cfr_angolo_limite()            
             
             tau_rif_up, alfa_rif_up, beta_rif_up, gamma_rif_up = jones_class.jones_reflection()
             self.biquaternions.loc[i, 'h_rif_up'] = Biquaternion(tau_rif_up, alfa_rif_up*1j, beta_rif_up*1j, gamma_rif_up*1j)
 
             tau_tra_up, alfa_tra_up, beta_tra_up, gamma_tra_up = jones_class.jones_transmission()
-            self.biquaternions.loc[i, 'h_tra_up'] = Biquaternion(tau_tra_up, alfa_tra_up*1j, beta_tra_up*1j, gamma_tra_up*1j)
+            if self.biquaternions.loc[i, 'ang_lim_up'] == 1:
+                self.biquaternions.loc[i, 'h_tra_up'] = Biquaternion(tau_tra_up, alfa_tra_up*1j, beta_tra_up*1j, gamma_tra_up*1j)
+            
+            #calcolo degli angoli limite
+            #angoli_limite[0, i] = angolo_limite(n0, n1) #angolo limite per la propagazione verso il basso
+            #angoli_limite[1, i] = angolo_limite(n1, n0) #angolo limite per la propagazione verso l'alto
             
 
     def propagazione(self):
@@ -212,35 +222,38 @@ class interazione:
                     
                     #######################viene trasmesso e produce un nuovo cammino####################
                     #trasmissione
-                    h_tra = self.biquaternions.loc[0, 'h_tra_dw']
+                    if self.biquaternions.loc[0, 'ang_lim_dw'] == 1:
+                        
+                        h_tra = self.biquaternions.loc[0, 'h_tra_dw']
                     
-                    #propagazione nel mezzo
-                    h_mat = self.biquaternions.loc[1, 'h_mat']
+                        #propagazione nel mezzo
+                        h_mat = self.biquaternions.loc[1, 'h_mat']
                     
-                    h, hdaga = multiplication([h_mat, h_tra])                    
-                    shdaga = s_.mul(hdaga)
-                    sfin = h.mul(shdaga)
+                        h, hdaga = multiplication([h_mat, h_tra])                    
+                        shdaga = s_.mul(hdaga)
+                        sfin = h.mul(shdaga)
                     
-                    #questo lo aggiungo al DF dei raggi
-                    self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2, "h_partial": h}, ignore_index=True)
+                        #questo lo aggiungo al DF dei raggi
+                        self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": 1, "arrivo": 2, "h_partial": h}, ignore_index=True)
                     #####################################################################################
 
                 elif ii_ == 1 and jj_ == 0:
                     
                     ######################viene trasmesso, e il cammino finisce qui!#####################
                     #non considero effetti di propagazione nell'aria (si può aggiungere, con h_mat indice 0)
+                    if self.biquaternions.loc[0, 'ang_lim_up'] == 1:
                     
-                    h, hdaga = multiplication([self.biquaternions.loc[0, 'h_tra_up'], h_part]) #aggiungo l'ultimo pezzo di trasmissione
+                        h, hdaga = multiplication([self.biquaternions.loc[0, 'h_tra_up'], h_part]) #aggiungo l'ultimo pezzo di trasmissione
 
-                    h_mul, h_muldaga = multiplication([self.biquaternions.loc[0, 'h_tra_up']])
-                    shdaga = s_.mul(h_muldaga)
-                    sfin	= h_mul.mul(shdaga)
+                        h_mul, h_muldaga = multiplication([self.biquaternions.loc[0, 'h_tra_up']])
+                        shdaga = s_.mul(h_muldaga)
+                        sfin	= h_mul.mul(shdaga)
                     
-                    self.s_h_fin = self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
+                        self.s_h_fin = self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
 
                     #####################################################################################                    
                     
-                    ###################viene riflesso in basso e produce un nuovo cammino################
+                    ###################viene riflesso in basso e produce un nuovo cammino################                    
                     #riflessione
                     h_rif = self.biquaternions.loc[0, 'h_rif_up']
                     
@@ -266,20 +279,22 @@ class interazione:
                         if jj_ < self.campione.strati+1:
                             #############################produce un raggio trasmesso#############################
                             #trasmissione
-                            h_tra = self.biquaternions.loc[ii_, 'h_tra_dw']
                             
-                            #propagazione nel mezzo jj_
-                            h_mat = self.biquaternions.loc[jj_, 'h_mat']
+                            if self.biquaternions.loc[ii_, 'ang_lim_dw'] == 1:
+                                h_tra = self.biquaternions.loc[ii_, 'h_tra_dw']
                             
-                            h, hdaga = multiplication([h_mat, h_tra, h_part])
+                                #propagazione nel mezzo jj_
+                                h_mat = self.biquaternions.loc[jj_, 'h_mat']
                             
-                            h_mul, h_muldaga = multiplication([ h_mat, h_tra])
+                                h, hdaga = multiplication([h_mat, h_tra, h_part])
+                            
+                                h_mul, h_muldaga = multiplication([ h_mat, h_tra])
                     
-                            shdaga = s_.mul(h_muldaga)
-                            sfin	= h_mul.mul(shdaga)
+                                shdaga = s_.mul(h_muldaga)
+                                sfin	= h_mul.mul(shdaga)
                         
-                            #lo aggiungo al DF dei raggi
-                            self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ + 1, "arrivo": jj_ + 1, "h_partial": h}, ignore_index=True)
+                                #lo aggiungo al DF dei raggi
+                                self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ + 1, "arrivo": jj_ + 1, "h_partial": h}, ignore_index=True)
                         
                             #####################################################################################                    
 
@@ -307,21 +322,22 @@ class interazione:
                         
                         #############################produce un raggio trasmesso#############################
                         #trasmissione
-                        h_tra = self.biquaternions.loc[jj_, 'h_tra_up']
+                        if self.biquaternions.loc[jj_, 'ang_lim_up'] == 1:
+                            h_tra = self.biquaternions.loc[jj_, 'h_tra_up']
                     
-                        #propagazione nel mezzo jj_
-                        h_mat = self.biquaternions.loc[jj_, 'h_mat']
+                            #propagazione nel mezzo jj_
+                            h_mat = self.biquaternions.loc[jj_, 'h_mat']
                         
-                        h, hdaga = multiplication([h_mat, h_tra, h_part])      
+                            h, hdaga = multiplication([h_mat, h_tra, h_part])      
 
-                        h_mul, h_muldaga = multiplication([ h_mat, h_tra])
+                            h_mul, h_muldaga = multiplication([ h_mat, h_tra])
                     
-                        shdaga = s_.mul(h_muldaga)
-                        sfin	= h_mul.mul(shdaga)
+                            shdaga = s_.mul(h_muldaga)
+                            sfin	= h_mul.mul(shdaga)
                         
-                        #lo aggiungo al DF dei raggi
-                        self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ - 1, "arrivo": jj_ - 1, "h_partial": h}, ignore_index=True)
-                        
+                            #lo aggiungo al DF dei raggi
+                            self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ - 1, "arrivo": jj_ - 1, "h_partial": h}, ignore_index=True)
+                            
                         #####################################################################################                    
 
                         #############################produce un raggio riflesso##############################
@@ -349,9 +365,8 @@ class interazione:
         self.s_quaternions = self.s_quaternions.reset_index(drop = True)
             
         self.nraggi = self.s_quaternions.shape[0]
-
-
-
+                           
+            
     def interference(self):
         h_ = []
         for i in self.s_h_fin.index:
