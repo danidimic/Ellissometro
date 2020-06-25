@@ -29,16 +29,16 @@ camp = campione(nc0, [nc1])
 #inizializzo la sorgente	
 sorg = sorgente(lenght=632.7193201669578)
 
-theta = [1.435, pi/2]
+theta = [0, 1.2, 1.435, pi/2]
 
-nval = 2
-
+nval = 4
 I = []
 Q = []
 U = []
 V = []
 
 for i in range(nval):
+    print('##############theta = ', theta[i],'###############à')
     
     theta0 = theta[i]
     
@@ -46,7 +46,7 @@ for i in range(nval):
     
     #coefficienti di fresnel della prima interfaccia
     r = camp.nc[0]/camp.nc[1]
-    a = camp.nc[1]/camp.nc[0]*cmath.cos(theta1)/cmath.cos(theta0)
+    a = (camp.nc[1]/camp.nc[0])*(cmath.cos(theta1)/cmath.cos(theta0))
     b = (r**2)*a
 
     rho1_sigma = (1-a)/(1+a);  #riflessività ortogonale
@@ -54,7 +54,8 @@ for i in range(nval):
 		
     tau1_sigma = 2/(1+a)		  #trasmissività ortogonale
     tau1_pi = 2*r/(1+b);		  #trasmissività parallela
-    
+    print('rho_s = ',rho1_sigma)
+    print('tau_s = ',tau1_sigma)
     #coefficiente di fresnel di trasmissione up
     r = camp.nc[1]/camp.nc[0]
     a = camp.nc[0]/camp.nc[1]*cmath.cos(theta0)/cmath.cos(theta1)
@@ -67,7 +68,7 @@ for i in range(nval):
 
     #inizializzazione del raggio iniziale
     y_sigma = 1
-    y_pi = 1 #polarizzazione lineare 45°
+    y_pi = 0 #polarizzazione lineare 45°
 
     #il PRIMO raggio viene riflesso dalla prima interfaccia
     y_sigma_fin1 = y_sigma*rho1_sigma
@@ -126,3 +127,9 @@ for i in range(nval):
     print('V = ', V) ############
     print()       
 
+    tra_S = camp.nc[1]/camp.nc[0]*y_sigma_int2**2/y_sigma**2#(abs(y_sigma_int2))**2/(abs(y_sigma))**2
+    rif_S = y_sigma_fin1**2/y_sigma**2#(abs(y_sigma_fin1))**2/(abs(y_sigma))**2
+    
+    print('coefficiente di trasmissione onda s = ', tra_S)
+    print('coefficiente di riflessione onda s = ', rif_S)
+    print()
