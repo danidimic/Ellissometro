@@ -18,7 +18,7 @@ n2 = 1+0.00000005j
 pi = math.pi
 
 #definisco il campione
-camp = campione(n0, [n1, sp1, n2])
+camp = campione(n0, [n1])#[n1, sp1, n2])
 
 #definisco la sorgente
 sorg = sorgente(lenght=632.7193201669578)
@@ -74,12 +74,15 @@ for i in range(nvalues):
 	inter = interazione(0.0001, camp, sorg, riniz)  #inizializzo oggetto interazione
 	inter.materials_to_jones(theta[i])
     
-	while inter.nraggi != 0:
-		inter.propagazione()
+	if camp.strati != 0:
+		while inter.nraggi != 0:
+			inter.propagazione()
 
-	#determino l'interferenza tra tutti i raggi ottenuti
-	hfin = inter.interference()
- 
+		#determino l'interferenza tra tutti i raggi ottenuti
+		hfin = inter.interference()
+	else:
+		hfin = inter.biquaternions.loc[0, 'h_rif_dw']
+        
 	#grandezze ellissometriche e vettore di Stokes finale
 	psi, delta, rfin = grandell([hfin], s, svfinal=True)
 
@@ -100,6 +103,9 @@ bar.finish()
 Psi = np.dot(Psi, 180/pi)
 Delta = np.dot(Delta, 180/pi)
 theta = np.dot(theta, 180/pi)
+
+print(Psi)
+print(Delta)
 
 #Grafico delle componenti del vettore di Stokes
 plt.title("Componenti vettori di Stokes")

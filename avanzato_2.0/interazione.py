@@ -435,7 +435,7 @@ def grandell(arr, s, ellipsometry=True, svfinal=False, quatfinal=False):
 		'''
 		#calcolo le grandezze ellissometriche psi, delta
 		psi = np.arctan( np.tan(rfin.ellipsometric_Psi()) / np.tan(rin.ellipsometric_Psi()) )
-		delta = cmath.phase(rin.ellipsometric_Delta()) - cmath.phase(rfin.ellipsometric_Delta())
+		delta = cmath.phase(rfin.ellipsometric_Delta()) - cmath.phase(rin.ellipsometric_Delta())
         
 		if delta < 0:
 			delta += 2*math.pi

@@ -116,7 +116,7 @@ class stokes_vector:
 	#Calcolo del parametro ellissometrico Psi
 	def ellipsometric_Psi(self):
 		Ex, Ey = self.electric_components()
-		return np.arctan(Ey/Ex)
+		return np.arctan(Ey.real/Ex.real)
 
 	#Calcolo del parametro ellissometrico Delta
 	def ellipsometric_Delta(self):

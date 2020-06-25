@@ -17,10 +17,10 @@ class jones:
         phase = (self.wsuc)*(self.nc0)*(self.spessore/np.cos(self.theta0))
         
         #print('cos(theta0): ',np.cos(self.theta0))
-        J_11 = np.exp(-1j*phase)
+        J_11 = np.exp(1j*phase)
         J_12 = 0
         J_21 = 0
-        J_22 = np.exp(-1j*phase)
+        J_22 = np.exp(1j*phase)
         #print('phase: ', np.exp(-1j*phase))
         
         return calcola_parametri(J_11, J_12, J_21, J_22)
