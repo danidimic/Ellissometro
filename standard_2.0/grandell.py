@@ -68,13 +68,13 @@ class ellissometro:
 		U=(2*abs(r_sigma)*abs(r_pi)*np.cos(delta1-sorg.delta_0))
 		V=(2*abs(r_sigma)*abs(r_pi)*np.sin(delta1-sorg.delta_0))
         
-		'''print('raggio finale: ')
+		print('raggio finale: ')
 		print('I = ', I)
 		print('Q = ', Q)
 		print('U = ', U)
 		print('V = ', V)
 		print('######################################')
-		print()'''
+		print()
 
 
 		results = [r_pi, r_sigma, delta1, psi1]
