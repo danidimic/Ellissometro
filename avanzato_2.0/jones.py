@@ -21,8 +21,9 @@ class jones:
         J_12 = 0
         J_21 = 0
         J_22 = np.exp(1j*phase)
-        #print('phase: ', np.exp(-1j*phase))
-        
+        #print('phase: ', phase)
+        #print('wsuc = ', self.wsuc)
+        #print('nc0 = ', self.nc0)       
         return calcola_parametri(J_11, J_12, J_21, J_22)
     
     def jones_transmission(self):
@@ -68,8 +69,8 @@ class jones:
     def cfr_angolo_limite(self):
         
         angolo_lim = angolo_limite(self.nc0.real, self.nc1.real)
-        print('angolo limite = ', angolo_lim)
-        print('theta1 = ', self.theta1)
+        #print('angolo limite = ', angolo_lim)
+        #print('theta1 = ', self.theta1)
         
         if self.theta1.real >= angolo_lim and angolo_lim != 0:
             return 0

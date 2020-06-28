@@ -220,6 +220,20 @@ class interazione:
                     self.s_h_fin = self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
                     #####################################################################################
                     
+                    '''print('Nuovo raggio verso esterno: ') ############
+       
+                    i_ = complex(self.s_h_fin.loc[k, 's_fin'].a) #
+                    q_ = complex(-1j*self.s_h_fin.loc[k, 's_fin'].b) #
+                    u_ = complex(-1j*self.s_h_fin.loc[k, 's_fin'].c) #
+                    v_ = complex(-1j*self.s_h_fin.loc[k, 's_fin'].d)
+                    
+                    print() ############
+                    print('I = ', i_) ############
+                    print('Q = ', q_) ############
+                    print('U = ', u_) ############
+                    print('V = ', v_) ############
+                    print()'''
+                    
                     #######################viene trasmesso e produce un nuovo cammino####################
                     #trasmissione
                     if self.biquaternions.loc[0, 'ang_lim_dw'] == 1:
@@ -252,7 +266,19 @@ class interazione:
                         self.s_h_fin = self.s_h_fin.append({'s_fin': sfin, 'h_fin': h}, ignore_index=True)
 
                     #####################################################################################                    
+                        '''print('Nuovo raggio trasmesso verso alto da interfaccia: ') ############
+       
+                        i_ = complex(self.s_h_fin.loc[k+2, 's_fin'].a) #
+                        q_ = complex(-1j*self.s_h_fin.loc[k+2, 's_fin'].b) #
+                        u_ = complex(-1j*self.s_h_fin.loc[k+2, 's_fin'].c) #
+                        v_ = complex(-1j*self.s_h_fin.loc[k+2, 's_fin'].d)
                     
+                        print() ############
+                        print('I = ', i_) ############
+                        print('Q = ', q_) ############
+                        print('U = ', u_) ############
+                        print('V = ', v_) ############
+                        print() ''' 
                     ###################viene riflesso in basso e produce un nuovo cammino################                    
                     #riflessione
                     h_rif = self.biquaternions.loc[0, 'h_rif_up']
@@ -316,7 +342,19 @@ class interazione:
                         self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_, "arrivo": jj_ - 2, "h_partial": h}, ignore_index=True)
 
                         #####################################################################################
-                        
+                        '''print('Nuovo raggio riflesso dal substrato e propagato: ') ############
+       
+                        i_ = complex(self.s_quaternions.loc[k+1, 's'].a) #
+                        q_ = complex(-1j*self.s_quaternions.loc[k+1, 's'].b) #
+                        u_ = complex(-1j*self.s_quaternions.loc[k+1, 's'].c) #
+                        v_ = complex(-1j*self.s_quaternions.loc[k+1, 's'].d)
+                    
+                        print() ############
+                        print('I = ', i_) ############
+                        print('Q = ', q_) ############
+                        print('U = ', u_) ############
+                        print('V = ', v_) ############
+                        print()   '''                     
                     #raggi che propagano verso l'alto
                     elif ii_ > jj_:
                         
@@ -339,7 +377,19 @@ class interazione:
                             self.s_quaternions = self.s_quaternions.append({'s': sfin, "provenienza": ii_ - 1, "arrivo": jj_ - 1, "h_partial": h}, ignore_index=True)
                             
                         #####################################################################################                    
-
+                            '''print('Nuovo raggio riflesso dal substrato e propagato: ') ############
+       
+                            i_ = complex(self.s_quaternions.loc[k+1, 's'].a) #
+                            q_ = complex(-1j*self.s_quaternions.loc[k+1, 's'].b) #
+                            u_ = complex(-1j*self.s_quaternions.loc[k+1, 's'].c) #
+                            v_ = complex(-1j*self.s_quaternions.loc[k+1, 's'].d)
+                    
+                            print() ############
+                            print('I = ', i_) ############
+                            print('Q = ', q_) ############
+                            print('U = ', u_) ############
+                            print('V = ', v_) ############
+                            print()  '''
                         #############################produce un raggio riflesso##############################
                         #riflessione
                         h_rif = self.biquaternions.loc[jj_, 'h_rif_up']
@@ -380,7 +430,7 @@ class interazione:
         htot = Biquaternion(0, 0, 0, 0)
         for i in h_:
             htot += i
-        
+            #print(i)        
         return htot
 
 
