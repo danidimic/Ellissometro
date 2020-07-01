@@ -39,7 +39,7 @@ U = []
 V = []
 
 nvalues = 200
-theta = np.linspace(0, pi/2, nvalues)#[0, 1.455]#
+theta = np.linspace(0, pi/2, nvalues)#[0, 1.46]#
 
 print("Calcolo delle grandezze ellissometriche al variare dell'angolo di incidenza")
 print()

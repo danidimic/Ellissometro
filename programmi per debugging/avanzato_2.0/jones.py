@@ -1,4 +1,5 @@
 import cmath
+import math
 import numpy as np
 
 class jones:
@@ -41,8 +42,13 @@ class jones:
         J_11 = tau_sigma       
         J_12 = 0
         J_21 = 0
-        J_22 = tau_pi        
+        J_22 = tau_pi 
         
+        fattore = nc1/nc0*cmath.sqrt(1-(nc0/nc1)**2*(cmath.sin(theta0))**2)/cmath.cos(theta0)
+        tra_S = fattore*(abs(tau_sigma))**2 #fattore*y_sigma_int2**2/y_sigma**2#
+
+        print('coefficiente di trasmissione onda s = ', tra_S)
+            
         return calcola_parametri(J_11, J_12, J_21, J_22)
     
     def jones_reflection(self):
@@ -61,7 +67,12 @@ class jones:
         J_11 = rho_sigma       
         J_12 = 0
         J_21 = 0
-        J_22 = rho_pi          
+        J_22 = rho_pi 
+         
+
+        rif_S = (abs(rho_sigma))**2
+    
+        print('coefficiente di riflessione onda s = ', rif_S)
         
         return calcola_parametri(J_11, J_12, J_21, J_22)
     

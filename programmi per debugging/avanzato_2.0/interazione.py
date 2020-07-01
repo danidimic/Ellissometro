@@ -164,6 +164,7 @@ class interazione:
             tau_mat, alfa_mat, beta_mat, gamma_mat = jones_class.jones_propagation()
             self.biquaternions.loc[i, 'h_mat'] = Biquaternion(tau_mat, alfa_mat*1j, beta_mat*1j, gamma_mat*1j)
             
+            print('interfaccia ', i, 'direzione verso il basso')
             tau_rif_dw, alfa_rif_dw, beta_rif_dw, gamma_rif_dw = jones_class.jones_reflection()
             self.biquaternions.loc[i, 'h_rif_dw'] = Biquaternion(tau_rif_dw, alfa_rif_dw*1j, beta_rif_dw*1j, gamma_rif_dw*1j)
             
@@ -175,6 +176,7 @@ class interazione:
             theta_start = jones_class.theta1
             jones_class = jones(n1, n0, theta_start, wsuc, spessore)
             
+            print('interfaccia ', i, 'direzione verso alto')            
             self.biquaternions.loc[i, 'ang_lim_up'] = jones_class.cfr_angolo_limite()            
             
             tau_rif_up, alfa_rif_up, beta_rif_up, gamma_rif_up = jones_class.jones_reflection()

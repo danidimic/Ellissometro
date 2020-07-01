@@ -12,13 +12,13 @@ from loadBar.bar import IncrementalBar
 
 #indici rifrazione
 n0 = 1
-n1 = 1.5
+n1 = 1.5+0.002j
 sp1 = 0.00002
-n2 = 1
+n2 = 1+0.001j
 pi = math.pi
 
 #definisco il campione
-camp = campione(n0, [n1]) #n0, [n1, sp1, n2]
+camp = campione(n0, [n1, sp1, n2]) #
 
 #definisco la sorgente
 sorg = sorgente(lenght=632.7193201669578)
@@ -38,8 +38,8 @@ Q = []
 U = []
 V = []
 
-nvalues = 2
-theta = [1.435, pi/2] #np.linspace(0, pi/2, nvalues)#
+nvalues = 3
+theta =  [0, 1.435, pi/2]#np.linspace(0, pi/2, nvalues)#
 
 print("Calcolo delle grandezze ellissometriche al variare dell'angolo di incidenza")
 print()
@@ -69,7 +69,9 @@ for i in range(nvalues):
 	bar.next()
 	consoleOut = "   Angolo di incidenza: " + str(round(180/pi * theta[i], 2)) + "°"
 	print(consoleOut, end="\r", flush=True)
-
+	print()
+	print()
+	print('############## ', theta[i], ' ###############')
     #calcolo le interazioni di tutti i possibili raggi con le interfacce
 	inter = interazione(0.01, camp, sorg, riniz)  #inizializzo oggetto interazione
 	inter.materials_to_jones(theta[i])
@@ -95,6 +97,7 @@ for i in range(nvalues):
 
 		#determino l'interferenza tra tutti i raggi ottenuti
 		hfin = inter.interference()
+		psi, delta, rfin = grandell([hfin], s, svfinal=True)
 	else:
 		hfin = inter.biquaternions.loc[0, 'h_rif_dw']
 		hfin_tra = inter.biquaternions.loc[0, 'h_tra_dw']
@@ -139,8 +142,21 @@ for i in range(nvalues):
 	#Parametri ellissometrici
 	Psi.append( psi.real )
 	Delta.append( delta.real )
-
+    
+	print('Raggio FINALE: ')
+	i_ = rfin.parameters[0] ############
+	q_ = rfin.parameters[1] ############
+	u_ = rfin.parameters[2] ############
+	v_ = rfin.parameters[3] ############
+        
+	print()
+	print('I = ', i_) ############
+	print('Q = ', q_) ############
+	print('U = ', u_) ############
+	print('V = ', v_) ############
+    
 bar.finish()
+
 
 
 #conversione in gradi

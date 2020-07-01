@@ -57,7 +57,7 @@ class jones:
         b = (r**2)*a
         
         rho_sigma = (1-a)/(1+a);  #riflessività ortogonale
-        rho_pi = (1-b)/(1+b);	  #riflessività parallela
+        rho_pi = -(1-b)/(1+b);	  #riflessività parallela
 
         J_11 = rho_sigma       
         J_12 = 0
