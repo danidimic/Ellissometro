@@ -20,7 +20,7 @@ U = []
 V = []
 
 nvalues = 200
-theta = np.linspace(0, math.pi/2, nvalues)#[0, 1.455]#, math.pi/2]
+theta = np.linspace(0, math.pi/2, nvalues)#[0, 1.46]#
 
 
 for i in range(nvalues):

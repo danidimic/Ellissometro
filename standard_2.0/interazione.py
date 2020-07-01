@@ -33,7 +33,7 @@ class interazione:
 		self.ii = [0]
 		self.jj = [1]
 		self.y_sigma = [1]
-		self.y_pi = [0]#[self.y_sigma[0]*math.tan(sorgente.psi_0)*cmath.exp(1j*sorgente.delta_0)]#
+		self.y_pi = [self.y_sigma[0]*math.tan(sorgente.psi_0)*cmath.exp(1j*sorgente.delta_0)]#[0]#
 		self.theta_ausiliario = theta0
 
 
@@ -68,7 +68,7 @@ class interazione:
 		b = (r**2)*a
 
 		rho_sigma_dw = (1-a)/(1+a);  #riflessività ortogonale
-		rho_pi_dw = (1-b)/(1+b);	  #riflessività parallela
+		rho_pi_dw = -(1-b)/(1+b);	  #riflessività parallela
 		
 		tau_sigma_dw = 2/(1+a)		  #trasmissività ortogonale
 		tau_pi_dw = 2*r/(1+b);		  #trasmissività parallela
@@ -87,7 +87,7 @@ class interazione:
 		b = (r**2)*a
 
 		rho_sigma_up = (1-a)/(1+a);  #riflessività ortogonale
-		rho_pi_up = (1-b)/(1+b);	  #riflessività parallela
+		rho_pi_up = -(1-b)/(1+b);	  #riflessività parallela
 		
 		tau_sigma_up = 2/(1+a)		  #trasmissività ortogonale
 		tau_pi_up = 2*r/(1+b);		  #trasmissività parallela	
@@ -348,6 +348,7 @@ class interazione:
 		            print('V = ', V)'''
                     
 		            print('intensità = ', I*self.campione.nc[0])
+		            print('x_sigma[x] = ', x_sigma[x])
 		            
 		        else:
 		            if ii[x] > jj[x]:

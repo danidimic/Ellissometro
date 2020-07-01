@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from grandell import ellissometro
 
-passo = 0.01
+passo = 0.017453292519943295
 nvalues = int(math.pi/2/passo)
 
 r_pi = []
@@ -11,7 +11,7 @@ r_sigma = []
 delta1 = []
 psi1 = []
 Theta = []
-E = ellissometro(0.5)
+E = ellissometro(0.01)
 
 for i in range(nvalues):
 	theta = passo*i  #angoli theta iniziali
