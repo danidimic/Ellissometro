@@ -62,6 +62,9 @@ for i in range(nval):
     a = camp.nc[0]/camp.nc[1]*cmath.cos(theta0)/cmath.cos(theta1)
     b = (r**2)*a
     
+    rho1_sigma_up = (1-a)/(1+a);  #riflessività ortogonale
+    rho1_pi_up = -(1-b)/(1+b);	  #riflessività parallela
+    
     tau1_sigma_up = 2/(1+a)		  #trasmissività ortogonale
     tau1_pi_up = 2*r/(1+b);		  #trasmissività parallela
     print('tau_s_up = ',tau1_sigma_up)
@@ -71,6 +74,7 @@ for i in range(nval):
     y_sigma = 1#0.18014218115842623#
     y_pi = 0 #polarizzazione lineare 45°
 
+    intensità_in = nc0*np.cos(theta0)*y_sigma**2
     print('intensità del raggio iniziale = ', nc0*np.cos(theta0)*y_sigma**2)
     print()    
     
@@ -79,14 +83,15 @@ for i in range(nval):
     y_sigma_fin1 = y_sigma*rho1_sigma
     y_pi_fin1 = y_pi*rho1_pi
 
-    print('intensità del raggio subito riflesso = ', nc0*np.cos(theta0)*y_sigma_fin1**2)
-    print('campo componente s = ', y_sigma_fin1)
-    print('campo componente p = ', y_pi_fin1)
+    intensità_rif1 = nc0*np.cos(theta0)*y_sigma_fin1**2
+    print('intensità del raggio subito riflesso = ', intensità_rif1)
+    #print('campo componente s = ', y_sigma_fin1)
+    #print('campo componente p = ', y_pi_fin1)
     print()
     #il SECONDO, viene trasmesso...
     y_sigma_int2 = y_sigma*tau1_sigma
-    intensità = nc1*abs(y_sigma_int2)**2*np.cos(theta1)
-    print('intensità dopo prima trasmissione = ', intensità)
+    intensità_tra1 = nc1*abs(y_sigma_int2)**2*np.cos(theta1)
+    print('intensità dopo prima trasmissione = ', intensità_tra1)
     
     y_pi_int2 = y_pi*tau1_pi  
     
@@ -94,11 +99,12 @@ for i in range(nval):
     tra_S = fattore*(abs(y_sigma_int2))**2/(abs(y_sigma))**2 #fattore*y_sigma_int2**2/y_sigma**2#
     rif_S = (abs(y_sigma_fin1))**2/(abs(y_sigma))**2 #y_sigma_fin1**2/y_sigma**2#
     
-    print('coefficiente di trasmissione onda s = ', tra_S)
+    #print('coefficiente di trasmissione onda s = ', tra_S)
     #print('coefficiente di riflessione onda s = ', rif_S)
     
-    print('somma = ', tra_S + rif_S)
-    print('campo componente s = ', y_sigma_int2)    
+    #print('somma = ', tra_S + rif_S)
+    #print('campo componente s = ', y_sigma_int2) 
+    print('somme delle intensità = ', intensità_tra1+intensità_rif1)
     print()
     
     phase = (sorg.wsuc*(0.00002)/np.cos(theta1))*nc1
@@ -108,11 +114,13 @@ for i in range(nval):
 
     y_sigma_ausiliario = y_sigma_int2
     y_sigma_int2 *= -rho1_sigma #riflessione su interfaccia da 1.5 a 1 (cambio segno)
-    intensità = nc1*abs(y_sigma_int2)**2*np.cos(theta1)
-    print('intensità dopo riflessione sul substrato = ', intensità)  
+    intensità_rif_sub = nc1*abs(y_sigma_int2)**2*np.cos(theta1)
+    intensità_tra_sub = nc0*abs(y_sigma_ausiliario*tau1_sigma_up)**2*np.cos(theta0)    
+    print('intensità dopo riflessione sul substrato = ', intensità_rif_sub)  
     rif_S = (abs(y_sigma_int2))**2/(abs(y_sigma_ausiliario))**2 #fattore*y_sigma_int2**2/y_sigma**2#
-    print('coefficiente di riflessione onda s = ', rif_S)
-    print('campo componente s = ', y_sigma_int2)
+    #print('coefficiente di riflessione onda s = ', rif_S)
+    #print('campo componente s = ', y_sigma_int2)
+    print('somme delle intensità = ', intensità_rif_sub+intensità_rif1+intensità_tra_sub)
     print()
     
     y_sigma_int2 *= np.exp(1j*phase)
@@ -122,13 +130,15 @@ for i in range(nval):
     y_sigma_ausiliario = y_sigma_int2     
     y_sigma_int2 *= tau1_sigma_up
     intensità = nc0*abs(y_sigma_int2)**2*np.cos(theta0)
+    intensità_rif_ulteriore = nc1*np.cos(theta1)*abs(y_sigma_ausiliario*rho1_sigma_up)**2
     print('intensità dopo trasmissione finale = ', intensità) 
+    print('somme delle intensità = ', intensità+intensità_rif1+intensità_tra_sub+intensità_rif_ulteriore)
     #print('x_sigma[x] = ', y_sigma_int2) 
    
     fattore = camp.nc[0]/camp.nc[1]*cmath.cos(theta0)/cmath.cos(theta1)
     tra_S = fattore*(abs(y_sigma_int2))**2/(abs(y_sigma_ausiliario))**2    
-    print('coefficiente di trasmissione onda s = ', tra_S) 
-    print('campo componente s = ', y_sigma_int2)
+    #print('coefficiente di trasmissione onda s = ', tra_S) 
+    #print('campo componente s = ', y_sigma_int2)
 
     print()
     print('Raggio iniziale:') ###########
@@ -184,6 +194,8 @@ for i in range(nval):
     print('interferenza: ')
     r_fin_sigma = y_sigma_fin1 + y_sigma_int2
     print('componenti s da sommare: ', y_sigma_fin1, y_sigma_int2)
+    intensità_interf = nc0*np.cos(theta0)*abs(r_fin_sigma)**2
+    print('intensità: ', nc0*abs(y_sigma_fin1)**2*np.cos(theta0), nc0*abs(y_sigma_int2)**2*np.cos(theta0))
     
     print('campo componente s = ', r_fin_sigma)
     r_fin_pi = 0
@@ -199,3 +211,7 @@ for i in range(nval):
     print('U = ', U) ############
     print('V = ', V) ############
     print()     
+    
+    intensità = nc0*abs(r_fin_sigma)**2*np.cos(theta0)
+    print('intensità raggio uscente = ', intensità)
+    print('somme delle intensità = ', intensità_interf+intensità_tra_sub)
