@@ -60,7 +60,7 @@ class ellissometro:
 		psi1 = math.atan( abs(r_pi/r_sigma) )
 		delta1 = cmath.phase( r_pi/r_sigma )
         
-		delta = delta1-delta0
+		delta = delta1-sorg.delta_0
         
 		if delta<-math.pi/2:
 			delta= delta + 2*math.pi
