@@ -58,10 +58,12 @@ class ellissometro:
 		r_sigma = inter.somma_sigma
         
 		psi1 = math.atan( abs(r_pi/r_sigma) )
-		delta1 = -cmath.phase( r_pi/r_sigma )
+		delta1 = cmath.phase( r_pi/r_sigma )
         
-		if delta1<-math.pi/2:
-			delta1= delta1 + 2*math.pi
+		delta = delta1-delta0
+        
+		if delta<-math.pi/2:
+			delta= delta + 2*math.pi
         
 		'''if delta1<0:
 			delta1= delta1 + 2*math.pi'''
@@ -80,5 +82,5 @@ class ellissometro:
 		print()
 
 
-		results = [r_pi, r_sigma, delta1, psi1]
+		results = [r_pi, r_sigma, delta, psi1]
 		return results
