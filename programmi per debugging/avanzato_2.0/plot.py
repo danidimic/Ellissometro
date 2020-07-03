@@ -12,9 +12,9 @@ from loadBar.bar import IncrementalBar
 
 #indici rifrazione
 n0 = 1
-n1 = 1.5+0.002j
+n1 = 1.5#+0.002j
 sp1 = 0.00002
-n2 = 1+0.001j
+n2 = 1#+0.001j
 pi = math.pi
 
 #definisco il campione
@@ -38,8 +38,8 @@ Q = []
 U = []
 V = []
 
-nvalues = 3
-theta =  [0, 1.435, pi/2]#np.linspace(0, pi/2, nvalues)#
+nvalues = 2
+theta =  [0, 1.46]#np.linspace(0, pi/2, nvalues)#
 
 print("Calcolo delle grandezze ellissometriche al variare dell'angolo di incidenza")
 print()
