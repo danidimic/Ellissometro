@@ -128,6 +128,23 @@ theta = np.dot(theta, 180/pi)
 #print(Psi)
 #print(Delta)
 
+#write data in 2 file
+file = open("Delta.txt","w")
+
+for i in range(nvalues):
+    line = str(theta[i]) + "\t" + str(Delta[i]) + "\n"
+    file.write(line)
+    
+file.close()
+
+file = open("Psi.txt","w")
+
+for i in range(nvalues):
+    line = str(theta[i]) + "\t" + str(Psi[i]) + "\n"
+    file.write(line)
+    
+file.close()
+
 #Grafico delle componenti del vettore di Stokes
 plt.title("Componenti vettori di Stokes")
 plt.xlabel("Angolo incidente [°]")
