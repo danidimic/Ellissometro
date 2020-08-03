@@ -4,30 +4,35 @@ import numpy as np
 import matplotlib.pyplot as plt
 from grandell import ellissometro
 
-passo = 0.01
-nvalues = int(math.pi/2/passo)
+#passo = 0.01
+#nvalues = int(math.pi/2/passo)
 
 r_pi = []
 r_sigma = []
 delta1 = []
 psi1 = []
 Theta = []
-E = ellissometro(0.0001)
+E = ellissometro(0.01)
 
 I = []
 Q = []
 U = []
 V = []
 
+nvalues = 200
+theta = np.linspace(0, math.pi/2, nvalues)#[0, 1.46]#
+
+
 for i in range(nvalues):
-	theta = passo*i  #angoli theta iniziali
-	res = E.grandell(theta) #calcolo delle grandezze ellissometriche
+	#theta = passo*i  #angoli theta iniziali
+	print('############ theta = ', theta[i], '#############')    
+	res = E.grandell(theta[i]) #calcolo delle grandezze ellissometriche
 
 	r_pi.append   (res[0])
 	r_sigma.append(res[1])
 	delta1.append (res[2])
 	psi1.append   (res[3])
-	Theta.append  (theta )
+	#Theta.append  (theta )
 	
 	#conversione da radianti in gradi
 	delta1[i] = 180*delta1[i]/math.pi
@@ -42,8 +47,8 @@ for i in range(nvalues):
 	U.append(2*abs(r_sigma[i])*abs(r_pi[i])*np.cos(res[2]))
 	V.append(2*abs(r_sigma[i])*abs(r_pi[i])*np.sin(res[2]))
     
-Theta = np.dot(Theta, 180/math.pi)    
-
+Theta = np.dot(theta, 180/math.pi)    
+'''
 #Grafico di Delta e Psi
 plt.xlabel("angolo incidente [°]")
 plt.ylabel("$\Delta$ | $\Psi$ [°]")
@@ -61,11 +66,10 @@ plt.plot(Theta, r_sigma, label='$R_{\sigma}$')
 plt.legend()
 plt.grid(True)
 plt.show()
-
+'''
 #Grafico di I, Q, U, V
 plt.title("Metodo standard")
 plt.xlabel("angolo incidente [°]")
-plt.ylabel("$I$ | $Q$ [°]")
 plt.plot(Theta, I, label='$I$')
 plt.plot(Theta, Q, label='$Q$')
 plt.plot(Theta, U, label='$U$')

@@ -48,20 +48,39 @@ class ellissometro:
 			print("delta_0: ", sorg.delta_0)
 	
 			
-		inter = interazione(0.1, camp, sorg, theta0)
+		inter = interazione(self.precisione, camp, sorg, theta0)
 		inter.inizializza()
 
 		while (len(inter.ii)!=0):
 			inter.propagazione()
 
-		r_pi = inter.somma_pi/(math.tan(sorg.psi_0)*cmath.exp(1j*sorg.delta_0))
+		r_pi = inter.somma_pi/(math.tan(sorg.psi_0)*cmath.exp(1j*sorg.delta_0)) ########
 		r_sigma = inter.somma_sigma
+        
+		psi1 = math.atan( abs(r_pi/r_sigma) )
+		delta1 = cmath.phase( r_pi/r_sigma )
+        
+		delta = -delta1-sorg.delta_0
+        
+		if delta<-math.pi/2:
+			delta= delta + 2*math.pi
+        
+		'''if delta1<0:
+			delta1= delta1 + 2*math.pi'''
+            
+		I=((abs(r_sigma))**2+(abs(r_pi))**2)
+		Q=((abs(r_sigma))**2-(abs(r_pi))**2)
+		U=(2*abs(r_sigma)*abs(r_pi)*np.cos(delta1-sorg.delta_0))
+		V=(2*abs(r_sigma)*abs(r_pi)*np.sin(delta1-sorg.delta_0))
+        
+		print('raggio finale: ')
+		print('I = ', I)
+		print('Q = ', Q)
+		print('U = ', U)
+		print('V = ', V)
+		print('######################################')
+		print()
 
-		psi1 = math.atan( abs(r_pi/r_sigma) );
-		delta1 = -cmath.phase( r_pi/r_sigma );
 
-		if delta1<0:
-			delta1= delta1 + 2*math.pi
-
-		results = [r_pi, r_sigma, delta1, psi1]
+		results = [r_pi, r_sigma, delta, psi1]
 		return results

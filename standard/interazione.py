@@ -13,10 +13,16 @@ class interazione:
 	def __init__(self, precisione, campione, sorgente, theta0):
 		
 		self.Theta = []		#vettore contenente tutti gli angoli di incidenza
-		self.rho_S = [] 	#vettore contenente tutte le riflessività ortogonali
-		self.rho_P = [] 	#vettore contenente tutte le riflessività parallele
-		self.tau_S = [] 	#vettore contenente tutte le trasmissività ortogonali
-		self.tau_P = [] 	#vettore contenente tutte le trasmissività parallele
+        
+		self.rho_S_dw = [] 	#vettore contenente tutte le riflessività ortogonali
+		self.rho_P_dw = [] 	#vettore contenente tutte le riflessività parallele
+		self.tau_S_dw = [] 	#vettore contenente tutte le trasmissività ortogonali
+		self.tau_P_dw = [] 	#vettore contenente tutte le trasmissività parallele
+        
+		self.rho_S_up = [] 	#vettore contenente tutte le riflessività ortogonali
+		self.rho_P_up = [] 	#vettore contenente tutte le riflessività parallele
+		self.tau_S_up = [] 	#vettore contenente tutte le trasmissività ortogonali
+		self.tau_P_up = [] 	#vettore contenente tutte le trasmissività parallele
 	
 		self.campione = campione	#campione da analizzare
 		self.sorgente = sorgente	#sorgente di radiazione
@@ -27,7 +33,7 @@ class interazione:
 		self.ii = [0]
 		self.jj = [1]
 		self.y_sigma = [1]
-		self.y_pi = [self.y_sigma[0]*math.tan(sorgente.psi_0)*cmath.exp(1j*sorgente.delta_0)]
+		self.y_pi = [self.y_sigma[0]*math.tan(sorgente.psi_0)*cmath.exp(1j*sorgente.delta_0)]#[0]#
 		self.theta_ausiliario = theta0
 
 
@@ -61,15 +67,56 @@ class interazione:
 		a = nc1/nc0*cmath.cos(theta1)/cmath.cos(theta0)
 		b = (r**2)*a
 
-		rho_sigma = (1-a)/(1+a);  #riflessività ortogonale
-		rho_pi = (1-b)/(1+b);	  #riflessività parallela
+		rho_sigma_dw = (1-a)/(1+a);  #riflessività ortogonale
+		rho_pi_dw = -(1-b)/(1+b);	  #riflessività parallela
 		
-		tau_sigma = 2/(1+a)		  #trasmissività ortogonale
-		tau_pi = 2*r/(1+b);		  #trasmissività parallela
+		tau_sigma_dw = 2/(1+a)		  #trasmissività ortogonale
+		tau_pi_dw = 2*r/(1+b);		  #trasmissività parallela
 		#print('theta1: ',theta1)        
 		#print('theta0: ',theta0)
-	
-		return [theta1, tau_sigma, rho_sigma, tau_pi, rho_pi]
+
+		fattore = (nc1/nc0*cmath.cos(theta1))/cmath.cos(theta0)        
+		T_s_dw = fattore*abs(tau_sigma_dw)**2 
+		R_s_dw = abs(rho_sigma_dw)**2 
+        
+		#print('T_s_dw = ', T_s_dw)
+		#print('R_s_dw = ', R_s_dw)        
+        
+		r = nc1/nc0
+		a = nc0/nc1*cmath.cos(theta0)/cmath.cos(theta1)
+		b = (r**2)*a
+
+		rho_sigma_up = (1-a)/(1+a);  #riflessività ortogonale
+		rho_pi_up = -(1-b)/(1+b);	  #riflessività parallela
+		
+		tau_sigma_up = 2/(1+a)		  #trasmissività ortogonale
+		tau_pi_up = 2*r/(1+b);		  #trasmissività parallela	
+		'''
+		print('tau_p_up = ', tau_pi_up)
+		print('tau_p_dw = ', tau_pi_dw) 
+		
+ 
+		print('rho_p_up = ', rho_pi_up)
+		print('rho_p_dw = ', rho_pi_dw) 
+		
+
+		print()
+		'''
+		'''
+		print('rho_s_dw = ', rho_sigma_dw)        
+		print('tau_s_dw = ', tau_sigma_dw)        
+		print('rho_s_up = ', rho_sigma_up)
+		print('tau_s_up = ', tau_sigma_up)
+		print('nc0, nc1', nc0, nc1)
+		print('theta1, theta0 = ', theta1, theta0)'''
+		fattore = (nc0/nc1*cmath.cos(theta0))/cmath.cos(theta1)
+		T_s_up = fattore*abs(tau_sigma_up)**2 
+		R_s_up = abs(rho_sigma_up)**2 
+		#print('fattore = ', fattore)
+		#print('T_s_up = ', T_s_up)
+		#print('R_s_up = ', R_s_up)     
+ 		
+		return [theta1, tau_sigma_dw, rho_sigma_dw, tau_pi_dw, rho_pi_dw, tau_sigma_up, rho_sigma_up, tau_pi_up, rho_pi_up]
 
 
 
@@ -82,19 +129,28 @@ class interazione:
 		"""
 		self.Theta.append(self.theta_ausiliario)
 		for i in range(self.campione.strati+1):
+			#print('strato ', i)
 			res = self.interfaccia(self.theta_ausiliario, self.campione.nc[i], self.campione.nc[i+1])
 			self.Theta.append(res[0])	#angolo di rifrazione
-			self.tau_S.append(res[1]) 	#trasmissività ortogonale
-			self.rho_S.append(res[2])	#riflessività ortogonale
-			self.tau_P.append(res[3])	#trasmissività parallela
-			self.rho_P.append(res[4])	#riflessività parallela
+			self.tau_S_dw.append(res[1]) 	#trasmissività ortogonale
+			self.rho_S_dw.append(res[2])	#riflessività ortogonale
+			self.tau_P_dw.append(res[3])	#trasmissività parallela
+			self.rho_P_dw.append(res[4])	#riflessività parallela
+			self.tau_S_up.append(res[5]) 	#trasmissività ortogonale
+			self.rho_S_up.append(res[6])	#riflessività ortogonale
+			self.tau_P_up.append(res[7])	#trasmissività parallela
+			self.rho_P_up.append(res[8])	#riflessività parallela
 			self.theta_ausiliario = res[0]
-
-		self.rho_P = np.conjugate( self.rho_P )
-		self.rho_S = np.conjugate( self.rho_S )
-		self.tau_P = np.conjugate( self.tau_P )
-		self.tau_S = np.conjugate( self.tau_S )
-        
+		'''
+		self.rho_P_up = np.conjugate( self.rho_P_up )
+		self.rho_S_up = np.conjugate( self.rho_S_up )
+		self.tau_P_up = np.conjugate( self.tau_P_up )
+		self.tau_S_up = np.conjugate( self.tau_S_up )
+		self.rho_P_dw = np.conjugate( self.rho_P_dw )
+		self.rho_S_dw = np.conjugate( self.rho_S_dw )
+		self.tau_P_dw = np.conjugate( self.tau_P_dw )
+		self.tau_S_dw = np.conjugate( self.tau_S_dw )
+		'''
 		#print('rho_p: ',self.rho_P)
 
 
@@ -168,48 +224,145 @@ class interazione:
 		           
 		        #se i raggi sono nel mezzo, ho un raggio riflesso, che risolvo subito, e uno trasmesso sotto
 		        if ii[x] == 0 and jj[x] == 1:
-		            self.somma_pi += x_pi[x]*self.rho_P[0]
-		            self.somma_sigma += x_sigma[x]*self.rho_S[0] 
+		            self.somma_pi += x_pi[x]*self.rho_P_dw[0]
+		            self.somma_sigma += x_sigma[x]*self.rho_S_dw[0] 
+                    
+		            '''print()
+		            print('**********************')
+		            print('raggio finale, parziale: ')
+		            print('componente P = ',self.somma_pi)
+		            print('componente S = ',self.somma_sigma)
+                    
+		            I = (abs(self.somma_sigma))**2+(abs(self.somma_pi))**2
+		            Q = (abs(self.somma_sigma))**2-(abs(self.somma_pi))**2
+		            U = 2*(self.somma_sigma*np.conj(self.somma_pi)).real
+		            V = -2*(self.somma_sigma*np.conj(self.somma_pi)).imag
+		            print('I = ', I)
+		            print('Q = ', Q)
+		            print('U = ', U)
+		            print('V = ', V)  
+		            print('*********************')
+		            print()     '''                
+                    
 		            #devo aggiungere il raggio trasmesso che viene prodotto (avrà ii=1, jj=2)
 		            ii_superficial_dt.append(1)
 		            jj_superficial_dt.append(2)
 		            #print("ii_superficial: ", ii_superficial_dt, ii_superficial_ur)
 		            
-		            phase = (-wsuc*(spessori[1])/np.cos(self.Theta[1]))*nc[1] #CONTROLLA COME INDICIZZI GLI STRATI E THETA!!!!!!!!
-		            
+		            phase = (wsuc*(spessori[1])/np.cos(self.Theta[1]))*nc[1] #CONTROLLA COME INDICIZZI GLI STRATI E THETA!!!!!!!!
+		            '''print('phase = ', phase)
+		            print('wsuc = ', wsuc)
+		            print('nc0 = ', nc[1])'''
 		            # -polarizzati p
-		            ydt_sup_pi.append(x_pi[x]*self.tau_P[0]*cmath.exp(phase*1j))
+		            ydt_sup_pi.append(x_pi[x]*self.tau_P_dw[0]*cmath.exp(phase*1j))
 		            # -polarizzati s
-		            ydt_sup_sigma.append(x_sigma[x]*self.tau_S[0]*cmath.exp(phase*1j))
+		            ydt_sup_sigma.append(x_sigma[x]*self.tau_S_dw[0]*cmath.exp(phase*1j))
+                    
+		            '''print()
+		            print('componente s trasmessa dalla superficie verso il basso = ', x_sigma[x]*self.tau_S_dw[0])
+		            print('componente s propagata verso il basso =',x_sigma[x]*self.tau_S_dw[0]*cmath.exp(phase*1j))
+		            print()
+		            
+		            print('raggio in ingresso: ')
+		            print(abs(x_pi[x]))
+		            I = (abs(x_sigma[x]))**2+(abs(x_pi[x]))**2
+		            Q = (abs(x_sigma[x]))**2-(abs(x_pi[x]))**2
+		            U = 2*(x_sigma[x]*np.conj(x_pi[x])).real
+		            V = -2*(x_sigma[x]*np.conj(x_pi[x])).imag
+		            print('I = ', I)
+		            print('Q = ', Q)
+		            print('U = ', U)
+		            print('V = ', V)'''
+                    
+		            '''print('raggio riflesso dalla superficie: ')
+		            I = (abs(x_sigma[x]*self.rho_S_dw[0]))**2+(abs(x_pi[x]*self.rho_P_dw[0]))**2
+                    
+		            Q = (abs(x_sigma[x]*self.rho_S_dw[0]))**2-(abs(x_pi[x]*self.rho_P_dw[0]))**2
+		            U = 2*(x_sigma[x]*self.rho_S_dw[0]*np.conj(x_pi[x]*self.rho_P_dw[0])).real
+		            V = -2*(x_sigma[x]*self.rho_S_dw[0]*np.conj(x_pi[x]*self.rho_P_dw[0])).imag
+		            print('I = ', I)
+		            print('Q = ', Q)
+		            print('U = ', U)
+		            print('V = ', V)
+                    
+		            print('intensità = ', I*self.campione.nc[0])'''
+                    
+		            '''print('raggio trasmesso verso il substrato dalla superficie: ')
+		            I = (abs(x_sigma[x]*self.tau_S_dw[0]*cmath.exp(phase*1j)))**2+(abs(x_pi[x]*self.tau_P_dw[0]*cmath.exp(phase*1j)))**2
+		            Q = (abs(x_sigma[x]*self.tau_S_dw[0]*cmath.exp(phase*1j)))**2-(abs(x_pi[x]*self.tau_P_dw[0]*cmath.exp(phase*1j)))**2
+		            U = 2*(x_sigma[x]*self.tau_S_dw[0]*cmath.exp(phase*1j)*np.conj(x_pi[x]*self.tau_P_dw[0]*cmath.exp(phase*1j))).real
+		            V = -2*(x_sigma[x]*self.tau_S_dw[0]*cmath.exp(phase*1j)*np.conj(self.tau_P_dw[0]*cmath.exp(phase*1j))).imag
+		            print('I = ', I)
+		            print('Q = ', Q)
+		            print('U = ', U)
+		            print('V = ', V)
+		            print()'''
 		            
 		        #se sono nel primo strato e stanno salendo ho un raggio trasmesso, ...idem
 		        elif ii[x] == 1 and jj[x] == 0:
-		            self.somma_pi += x_pi[x]*self.tau_P[0] #####
-		            self.somma_sigma += x_sigma[x]*self.tau_S[0] ##### #vedi formule coefficienti di Fresnel!
+                    
+		            #print('componente s raggio precedente =', self.somma_sigma)
+                    
+		            self.somma_pi += x_pi[x]*self.tau_P_up[0] #####
+		            self.somma_sigma += x_sigma[x]*self.tau_S_up[0] ##### #vedi formule coefficienti di Fresnel!
+		            '''print('raggio trasmesso verso alto da superficie: ')
+		            print('componente P = ',x_pi[x]*self.tau_P_up[0])
+		            print('componente S = ',x_sigma[x]*self.tau_S_up[0])'''
+		            print()
+		            print('**********************')
+		            print('raggio finale, parziale: ')
+		            print('componente P = ',self.somma_pi)
+		            print('componente S = ',self.somma_sigma)
+                    
+		            I = (abs(self.somma_sigma))**2+(abs(self.somma_pi))**2
+		            Q = (abs(self.somma_sigma))**2-(abs(self.somma_pi))**2
+		            U = 2*(self.somma_sigma*np.conj(self.somma_pi)).real
+		            V = -2*(self.somma_sigma*np.conj(self.somma_pi)).imag
+		            print('I = ', I)
+		            print('Q = ', Q)
+		            print('U = ', U)
+		            print('V = ', V)  
+		            print('*********************')
+		            print()
+                    
 		            #devo aggiungere il raggio che manca (come prima)
 		            ii_superficial_ur.append(1)
 		            jj_superficial_ur.append(2)
 		            
-		            phase = (-wsuc*(spessori[1])/np.cos(self.Theta[1]))*nc[1] #CONTROLLA COME INDICIZZI GLI STRATI!!!!!!!!
+		            phase = (wsuc*(spessori[1])/np.cos(self.Theta[1]))*nc[1] #CONTROLLA COME INDICIZZI GLI STRATI!!!!!!!!
 		            
 		            # -polarizzati p
-		            yur_sup_pi.append(x_pi[x]*(-self.rho_P[0])*cmath.exp(phase*1j))
+		            yur_sup_pi.append(x_pi[x]*(self.rho_P_up[0])*cmath.exp(phase*1j))
 		            # -polarizzati s
-		            yur_sup_sigma.append(x_sigma[x]*(-self.rho_S[0])*cmath.exp(phase*1j))
+		            yur_sup_sigma.append(x_sigma[x]*(self.rho_S_up[0])*cmath.exp(phase*1j))
+		            
+		            print('raggio trasmesso dalla superficie e uscente: ')
+		            '''print('componente s raggio aggiunto = ', x_sigma[x]*self.tau_S_up[0] )'''
+		            I = (abs(x_sigma[x]*self.tau_S_up[0]))**2+(abs(x_pi[x]*self.tau_P_up[0]))**2
+		            '''Q = (abs(x_sigma[x]*self.tau_S_up[0]))**2-(abs(x_pi[x]*self.tau_P_up[0]))**2
+		            U = 2*(x_sigma[x]*self.tau_S_up[0]*np.conj(x_pi[x]*self.tau_P_up[0])).real
+		            V = -2*(x_sigma[x]*self.tau_S_up[0]*np.conj(x_pi[x]*self.tau_P_up[0])).imag
+		            print('I = ', I)
+		            print('Q = ', Q)
+		            print('U = ', U)
+		            print('V = ', V)'''
+                    
+		            print('intensità = ', I*self.campione.nc[0])
+		            print('x_sigma[x] = ', x_sigma[x])
 		            
 		        else:
 		            if ii[x] > jj[x]:
 		                indici_raggi_su.append(x)
-		                irho_pi[x] = -self.rho_P[jj[x]] #quando ho riflessione, ho interazione con l'interfaccia che sta sopra...
-		                irho_sigma[x] = -self.rho_S[jj[x]] #...in direzione "opposta", quindi... (vedi formule coefficienti di Fresnel)
-		                itau_pi[x] = self.tau_P[jj[x]] #anche qui: vedi formule e te ne convinci!
-		                itau_sigma[x] = self.tau_S[jj[x]]
+		                irho_pi[x] = self.rho_P_up[jj[x]] #quando ho riflessione, ho interazione con l'interfaccia che sta sopra...
+		                irho_sigma[x] = self.rho_S_up[jj[x]] #...in direzione "opposta", quindi... (vedi formule coefficienti di Fresnel)
+		                itau_pi[x] = self.tau_P_up[jj[x]] #anche qui: vedi formule e te ne convinci!
+		                itau_sigma[x] = self.tau_S_up[jj[x]]
 		            elif ii[x] < jj[x] and ii[x] < strati+1: #non analizzo più i raggi che vanno nel substrato
 		                indici_raggi_giù.append(x)
-		                irho_pi[x] = self.rho_P[ii[x]]
-		                irho_sigma[x] = self.rho_S[ii[x]]
-		                itau_pi[x] = self.tau_P[ii[x]]
-		                itau_sigma[x] = self.tau_S[ii[x]]
+		                irho_pi[x] = self.rho_P_dw[ii[x]]
+		                irho_sigma[x] = self.rho_S_dw[ii[x]]
+		                itau_pi[x] = self.tau_P_dw[ii[x]]
+		                itau_sigma[x] = self.tau_S_dw[ii[x]]
 		#else elimino le componenti dei raggi troppo flebili da x_pi e x_sigma???
 		    
 		nraggi_up = len(indici_raggi_su)
@@ -238,7 +391,7 @@ class interazione:
 		#raggi che salgono
 		for x in range (0, nraggi_up):
 		    #vengono prodotti raggi riflessi
-		    phase = (-wsuc*(spessori[ii[indici_raggi_su[x]]])/np.cos(self.Theta[ii[indici_raggi_su[x]]]))*nc[ii[indici_raggi_su[x]]]
+		    phase = (wsuc*(spessori[ii[indici_raggi_su[x]]])/np.cos(self.Theta[ii[indici_raggi_su[x]]]))*nc[ii[indici_raggi_su[x]]]
 		 
 		    # -polarizzati p
 		    yur_pi[x] = x_pi[indici_raggi_su[x]]*irho_pi[indici_raggi_su[x]]*cmath.exp(phase*1j)
@@ -250,7 +403,7 @@ class interazione:
 		    jj_ur[x] = ii[indici_raggi_su[x]]+1
 		        
 		    #vengono prodotti raggi trasmessi
-		    phase = (-wsuc*(spessori[ii[indici_raggi_su[x]]-1])/np.cos(self.Theta[ii[indici_raggi_su[x]]-1]))*nc[ii[indici_raggi_su[x]]-1]
+		    phase = (wsuc*(spessori[ii[indici_raggi_su[x]]-1])/np.cos(self.Theta[ii[indici_raggi_su[x]]-1]))*nc[ii[indici_raggi_su[x]]-1]
 		    
 		    # -polarizzati p
 		    yut_pi[x] = x_pi[indici_raggi_su[x]]*itau_pi[indici_raggi_su[x]]*cmath.exp(phase*1j)
@@ -260,11 +413,21 @@ class interazione:
 		    #calcolo la direzione dei nuovi raggi trasmessi (verso l'alto)
 		    ii_ut[x] = ii[indici_raggi_su[x]]-1
 		    jj_ut[x] = ii[indici_raggi_su[x]]-2
-		 
+		    
+		    '''print('raggio che sale: ')
+		    I = (abs(ydt_sigma[x]))**2+(abs(ydt_pi[x]))**2
+		    Q = (abs(ydt_sigma[x]))**2-(abs(ydt_pi[x]))**2
+		    U = 2*(ydt_sigma[x]*np.conj(ydt_pi[x])).real
+		    V = -2*(ydt_sigma[x]*np.conj(ydt_pi[x])).imag
+		    print('I = ', I)
+		    print('Q = ', Q)
+		    print('U = ', U)
+		    print('V = ', V) '''
+		    
 		#raggi che scendono
 		for x in range(0, nraggi_down):
 		    #vengono prodotti raggi riflessi
-		    phase = (-wsuc*(spessori[ii[indici_raggi_giù[x]]])/np.cos(self.Theta[ii[indici_raggi_giù[x]]]))*nc[ii[indici_raggi_giù[x]]]
+		    phase = (wsuc*(spessori[ii[indici_raggi_giù[x]]])/np.cos(self.Theta[ii[indici_raggi_giù[x]]]))*nc[ii[indici_raggi_giù[x]]]
 		    # -polarizzati p
 		    ydr_pi[x] = x_pi[indici_raggi_giù[x]]*irho_pi[indici_raggi_giù[x]]*cmath.exp(phase*1j)
 		    # -polarizzati s
@@ -274,8 +437,25 @@ class interazione:
 		    ii_dr[x] = ii[indici_raggi_giù[x]]
 		    jj_dr[x] = ii[indici_raggi_giù[x]]-1
 
-		    phase = (-wsuc*(spessori[ii[indici_raggi_giù[x]]+1])/np.cos(self.Theta[ii[indici_raggi_giù[x]]+1]))*nc[ii[indici_raggi_giù[x]]+1]
+		    phase = (wsuc*(spessori[ii[indici_raggi_giù[x]]+1])/np.cos(self.Theta[ii[indici_raggi_giù[x]]+1]))*nc[ii[indici_raggi_giù[x]]+1]
+		    '''print()
+		    print('componente s riflessa dal substrato = ', x_sigma[indici_raggi_giù[x]]*irho_sigma[indici_raggi_giù[x]])           
+		    print('componente s propagata = ', ydr_sigma[x])'''
+
 		    
+		    print('raggio che viene riflesso dal substrato: ')
+		    I = (abs(ydr_sigma[x]))**2+(abs(ydr_pi[x]))**2
+		    '''Q = (abs(ydr_sigma[x]))**2-(abs(ydr_pi[x]))**2
+		    U = 2*(ydr_sigma[x]*np.conj(ydr_pi[x])).real
+		    V = -2*(ydr_sigma[x]*np.conj(ydr_pi[x])).imag
+		    print('I = ', I)
+		    print('Q = ', Q)
+		    print('U = ', U)
+		    print('V = ', V)     '''      
+            
+            
+		    print('intensità = ', I*self.campione.nc[1])
+		    		    
 		    # -polarizzati p
 		    ydt_pi[x] = x_pi[indici_raggi_giù[x]]*itau_pi[indici_raggi_giù[x]]*cmath.exp(phase*1j)
 		    # -polarizzati s
@@ -284,7 +464,8 @@ class interazione:
 		    #calcolo la direzione dei nuovi raggi trasmessi (verso il basso)
 		    ii_dt[x] = ii[indici_raggi_giù[x]]+1
 		    jj_dt[x] = ii[indici_raggi_giù[x]]+2
-		    
+            
+
 		#nuovi array (liste) con le direzioni dei nuovi raggi prodotti    
 		self.ii = ii_ur + ii_ut + ii_dr + ii_dt + ii_superficial_dt + ii_superficial_ur
 		self.jj = jj_ur + jj_ut + jj_dr + jj_dt + jj_superficial_dt + jj_superficial_ur
@@ -292,4 +473,18 @@ class interazione:
 		#ampiezze dei nuovi raggi prodotti
 		self.y_pi = yur_pi + yut_pi + ydr_pi + ydt_pi + ydt_sup_pi + yur_sup_pi
 		self.y_sigma = yur_sigma + yut_sigma + ydr_sigma + ydt_sigma + ydt_sup_sigma + yur_sup_sigma
+		'''
+		if len(self.y_pi) != 0:
+		    print('raggio in magazzino:')
+		    I = (abs(self.y_sigma[0]))**2+(abs(self.y_pi[0]))**2
+		    Q = (abs(self.y_sigma[0]))**2-(abs(self.y_pi[0]))**2
+		    U = 2*(self.y_sigma[0]*np.conj(self.y_pi[0])).real
+		    V = -2*(self.y_sigma[0]*np.conj(self.y_pi[0])).imag
+		    print('I = ', I)
+		    print('Q = ', Q)
+		    print('U = ', U)
+		    print('V = ', V)
+		'''
+		#print(self.y_pi[0])
+		#print(self.y_sigma)
 
