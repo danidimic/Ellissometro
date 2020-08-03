@@ -1,5 +1,3 @@
-class campione:
-
 #    campione(nc0,nc1,[h1,..,[ncx,hx],..,ncN])
 #
 #    Definisce il modello di un sistema su cui effettuare la simulazione di misure ellissometriche
@@ -14,7 +12,9 @@ class campione:
 #    ncN =       indice di rifrazione dell'ultimo mezzo, cioe' il subsrato (e' gia' nc1 nel caso
 #                  di un singolo mezzo).
 
-    def __init__(self,nc0,varargin):
+class campione:
+
+    def __init__(self, nc0, varargin):
 
         self.spessori = [0]
         self.nc = [nc0]
@@ -24,7 +24,7 @@ class campione:
 
         for count in range(0,self.strati):
             self.nc.append(varargin[2*count])
-            self.spessori.append(varargin[2*count+1])
+            self.spessori.append(float(varargin[2*count+1].real))
         self.spessori.append(0) #MOSSA MAGICA
 
         self.nc.append(varargin[-1])
@@ -36,5 +36,35 @@ class campione:
         for count in range(0,len(self.nc)):
         	if self.nc[count].imag < 0:
         		self.nc[count] = self.nc[count].conjugate()
+
+
+
+def loadCampione():
+
+    file = open("campione.txt","r")
+
+    line = str(file.readline())
+    nc0 = float(file.readline())
+    line = str(file.readline())
+    varargin = []
+
+    while True:
+        line = str(file.readline())
+
+        if line == "Indice del substrato \n":
+            break
+
+        else:
+            x = complex(line)
+            varargin.append(x)
+
+    line = str(file.readline())
+    ncN = complex(line)
+    varargin.append(ncN)
+    
+    file.close()
+
+    camp = campione(nc0, varargin)
+    return camp
 
 

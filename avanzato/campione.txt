@@ -1,4 +1,7 @@
+Indice del mezzo iniziale
 1
+Successione indici di rifrazione - spessori (in metri)
 1.5+0.00000002j
-0.00002
+0.000000630
+Indice del substrato 
 1+0.00000005j
