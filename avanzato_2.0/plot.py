@@ -14,6 +14,7 @@ from loadBar.bar import IncrementalBar
 n0 = 1
 n1 = 1.5#+0.00000002j
 sp1 = 0.00002
+sp1 = 0.000000630
 n2 = 1#+0.00000005j
 pi = math.pi
 

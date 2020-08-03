@@ -33,6 +33,6 @@ class campione:
             if self.nc[count].real < 0:
                 self.nc[count] = - self.nc[count]
 
-        for count in range(0,len(self.nc)):
-        	if self.nc[count].imag > 0:
-        		self.nc[count] = self.nc[count].conjugate()
+#        for count in range(0,len(self.nc)):
+#        	if self.nc[count].imag > 0:
+#        		self.nc[count] = self.nc[count].conjugate()
